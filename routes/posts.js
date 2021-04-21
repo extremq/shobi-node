@@ -6,7 +6,8 @@ const Post = require('../models/post')
 // All Posts Route
 router.get('/', async (req, res) => {
     let searchOptions = { }
-    if (req.query.tags != null && req.query.tags !== '') {
+    console.log(req.query.tags.match("\w"))
+    if (req.query.tags != null && req.query.tags.match("\w") !== null) {
         tags = req.query.tags.match(/\S+/g) || []
         searchOptions.tags = { $all: tags }
     }

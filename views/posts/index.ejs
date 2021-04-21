@@ -1,0 +1,14 @@
+<h2>Search posts</h2>
+<form action="/posts" method="get">
+    <label>By tag</label>
+    <% if (searchOptions.tags) { %> 
+    <input type="text" name="tags" pattern="[a-z0-9_- ]+" value="<%= searchOptions.tags['$all'].join(' ') %>">
+    <% } else { %>
+    <input type="text" name="tags" pattern="[a-z0-9_- ]+" placeholder="Enter tags separated by one space">
+    <% } %>
+    <button type="submit">Search</button>
+</form>
+<br>
+<% posts.forEach(post => { %>
+    <div><img src="<%- post.imgLink %>" width="500px"></div>
+<% }) %>

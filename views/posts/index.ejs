@@ -1,11 +1,7 @@
 <h2>Search posts</h2>
 <form action="/posts" method="get">
     <label>By tag</label>
-    <% if (searchOptions.tags) { %> 
-    <input type="text" name="tags" pattern="[a-z0-9_- ]+" value="<%= searchOptions.tags['$all'].join(' ') %>">
-    <% } else { %>
-    <input type="text" name="tags" pattern="[a-z0-9_- ]+" placeholder="Enter tags separated by one space">
-    <% } %>
+    <input type="text" name="tags" pattern="[a-z0-9_- ]+" value="<%= searchOptions.tags?.$all.join(' ') %>">
     <button type="submit">Search</button>
 </form>
 <br>

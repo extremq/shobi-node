@@ -10,8 +10,6 @@ router.get('/', async (req, res) => {
         tags = req.query.tags.match(/\S+/g) || []
         searchOptions.tags = { $all: tags }
     }
-    console.log(searchOptions)
-    console.log(searchOptions.tags['$all'].join(' '))
     try {
         const posts = await Post.find(searchOptions)
         res.render('posts/index', { 

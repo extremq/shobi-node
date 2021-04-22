@@ -1,10 +1,53 @@
-<h2>Search posts</h2>
+<div class="container">
+<h3 style="text-align: center;">Search posts</h2>
 <form action="/posts" method="get">
-    <label>By tag</label>
-    <input type="text" name="tags" pattern="[a-z0-9_- ]+" value="<%= searchOptions.tags?.$all.join(' ') %>">
-    <button type="submit">Search</button>
+    <div class="card" style="max-width: 500px; margin:auto">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">By title</label>
+                    <input class="form-control form-control-sm" type="text" name="title" value="<%= searchOptions.title?.$regex %>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">By description</label>
+                    <input class="form-control form-control-sm" type="text" name="description" value="<%= searchOptions.description?.$regex %>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">By text</label>
+                    <input class="form-control form-control-sm" type="text" name="markdown" value="<%= searchOptions.markdown?.$regex %>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">By tag</label>
+                    <input class="form-control form-control-sm" type="text" name="tags" pattern="[a-z0-9_- ]+" value="<%= searchOptions.tags?.$all.join(' ') %>">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-outline-success btn-sm" type="submit">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
-<br>
+
 <% posts.forEach(post => { %>
-    <div><img src="<%- post.imgLink %>" width="500px"></div>
+    <div class="card mb-3" style="max-width: 500px; margin:auto">
+        <% if (post.banner && post.bannerEncoding) { %>
+        <img src="<%= `data:${post.bannerEncoding};charset=utf-8;base64,${post.banner.toString('base64')}` %>" style="max-width: 500px;">
+        <% } %>
+        <div class="card-body">
+            <h5 class="card-title"><%= post.title %> <a href="posts/<%= post.id %>" class="fa fa-link fa-sm" style="text-decoration: none;"></a></h5>
+            <h6 class="card-subtitle text-muted mb-2">by <%= post.author %> on <%= post.createdAt.split('T')[0] %>.</h6>
+            <p class="card-text"><%= post.description %></p>
+            <% if (post.markdown) { %>
+            <a class="btn btn-sm btn-outline-primary" href="posts/<%= post.id %>">Read the post</a>
+            <% } %>
+        </div>
+        <% if (post.tags.length > 0) { %>
+        <div class="card-footer">
+            Tags: 
+            <% post.tags.forEach(tag => { %>
+                <a href="posts?tags=<%= tag %>"><%= tag %></a>
+            <% }); %>
+        </div>
+        <% } %>
+    </div>
 <% }) %>

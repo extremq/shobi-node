@@ -1,6 +1,14 @@
-<h2>New Post</h2>
-<form action="/posts" method="post">
-    <%- include('_form_fields') %>
-    <a href="/posts">Cancel</a>
-    <button type="submit">Create</button>
-</form>
+<div class="container">
+    <h3 style="text-align: center;">New Post</h2>
+    <form name="postCreation" action="/posts" method="post">
+        <div class="card" style="max-width: 500px; margin:auto">
+            <div class="card-body">
+                <%- include('_form_fields') %>
+                <div class="mt-3">
+                    <a class="btn btn-sm btn-outline-danger" href="/posts">Cancel</a>
+                    <button class="btn btn-sm btn-outline-success" type="submit">Create</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,13 +1,31 @@
 const mongoose = require('mongoose')
 
+const bannerImageBasePath = 'uploads/banners'
+
 const postSchema = new mongoose.Schema({
     createdAt: {
         type: String,
         required: true
     },
-    imgLink: {
+    banner: {
+        type: Buffer,
+        required: false
+    },
+    bannerEncoding: {
+        type: String,
+        required: false
+    },
+    title: {
         type: String,
         required: true
+    },
+    description: {
+        type: String,
+        required: false,
+    },
+    markdown: {
+        type: String,
+        required: false
     },
     tags: {
         type: Array,
@@ -24,3 +42,4 @@ const postSchema = new mongoose.Schema({
 })
 
 module.exports = mongoose.model('Post', postSchema)
+module.exports.bannerImageBasePath = bannerImageBasePath

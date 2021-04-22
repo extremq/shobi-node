@@ -1,0 +1,15 @@
+<div class="container mb-4">
+    <div class="card" style="max-width: 500px; margin: auto">
+        <% if (post.banner && post.bannerEncoding) { %>
+        <img src="<%= `data:${post.bannerEncoding};charset=utf-8;base64,${post.banner.toString('base64')}` %>" style="max-width: 500px;">
+        <% } %>
+        <div class="card-body">
+            <h3 class="card-title" style="text-align: center;"><i><%= post.title %></i> <a href="<%= post.id %>" class="fa fa-link fa-sm" style="text-decoration: none;"></a></h3>
+            <p class="card-subtitle text-muted" style="text-align: center;">by <%= post.author %> on <%= post.createdAt.split('T')[0] %>.</p>
+            <% if (post.markdown) { %>
+            <hr>
+            <%- post.markdown %>
+            <% } %> 
+        </div>
+    </div>
+</div>

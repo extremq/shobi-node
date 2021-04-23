@@ -1,53 +1,110 @@
-<div class="container">
-<h3 style="text-align: center;">Search posts</h2>
+<div class="container" id="page">
 <form action="/posts" method="get">
-    <div class="card" style="max-width: 500px; margin:auto">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">By title</label>
-                    <input class="form-control form-control-sm" type="text" name="title" value="<%= searchOptions.title?.$regex %>">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">By description</label>
-                    <input class="form-control form-control-sm" type="text" name="description" value="<%= searchOptions.description?.$regex %>">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">By text</label>
-                    <input class="form-control form-control-sm" type="text" name="markdown" value="<%= searchOptions.markdown?.$regex %>">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">By tag</label>
-                    <input class="form-control form-control-sm" type="text" name="tags" pattern="[a-z0-9_- ]+" value="<%= searchOptions.tags?.$all.join(' ') %>">
-                </div>
-                <div class="col-12">
-                    <button class="btn btn-outline-success btn-sm" type="submit">Search</button>
+    <div class="accordion" id="accordionExample" style="max-width: 500px; margin:auto">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Search posts
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">By title</label>
+                            <input class="form-control form-control-sm" type="text" name="title" value="">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">By description</label>
+                            <input class="form-control form-control-sm" type="text" name="description" value="">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">By text</label>
+                            <input class="form-control form-control-sm" type="text" name="markdown" value="">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">By tag</label>
+                            <input class="form-control form-control-sm" type="text" name="tags" pattern="[a-z0-9_- ]+" value="">
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-outline-success btn-sm" type="submit">Search <i class="fa fa-sm fa-search"></i></button>
+                            <a class="btn btn-outline-danger btn-sm" href="/posts">Clear filter <i class="far fa-sm fa-trash-alt"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </form>
 
-<% posts.forEach(post => { %>
-    <div class="card mb-3" style="max-width: 500px; margin:auto">
-        <% if (post.banner && post.bannerEncoding) { %>
-        <img src="<%= `data:${post.bannerEncoding};charset=utf-8;base64,${post.banner.toString('base64')}` %>" style="max-width: 500px;">
-        <% } %>
-        <div class="card-body">
-            <h5 class="card-title"><%= post.title %> <a href="posts/<%= post.id %>" class="fa fa-link fa-sm" style="text-decoration: none;"></a></h5>
-            <h6 class="card-subtitle text-muted mb-2">by <%= post.author %> on <%= post.createdAt.split('T')[0] %>.</h6>
-            <p class="card-text"><%= post.description %></p>
-            <% if (post.markdown) { %>
-            <a class="btn btn-sm btn-outline-primary" href="posts/<%= post.id %>">Read the post</a>
-            <% } %>
+<div class="main-content">
+    <!-- content to be added here -->
+</div>
+<div id="spinner" class="mb-3" style="text-align: center;">
+    <i class="fas fa-fan fa-2x fa-spin"></i>
+</div>
+
+<div class="position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 5">
+    <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Link copied to clipboard.
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
-        <% if (post.tags.length > 0) { %>
-        <div class="card-footer">
-            Tags: 
-            <% post.tags.forEach(tag => { %>
-                <a href="posts?tags=<%= tag %>"><%= tag %></a>
-            <% }); %>
-        </div>
-        <% } %>
     </div>
-<% }) %>
+</div>
+<script>
+var page = 1
+var lastRequest = + new Date() - 1 * 1000
+var reachedEnd = false
+
+var mainLoopId = setInterval(function(){
+    updatePosts()
+}, 1000);
+
+$(window).scroll(function(){
+    updatePosts()
+});
+
+function updatePosts(){
+    var aBot = $('#page').position().top + $('#page')[0].scrollHeight;
+    if(reachedEnd == false && $(window).scrollTop() + window.screen.height>= aBot && (+ new Date()) - lastRequest > 1 * 1000) {
+        lastRequest = + new Date()
+        url = new URL(window.location.href)
+        search = url.search
+        $.ajax({
+            method: "get",
+            url: "/posts/page/" + page + search,
+            success: function(response){
+                page = page + 1
+                if (response.length < 64) {
+                    reachedEnd = true
+                    $('#spinner').remove()
+                } 
+                else {
+                    $('.main-content').append(response)
+                }
+            }
+        });
+    }
+}
+    
+function copyToClipboard(id) {
+    var dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    var copyText = window.location.hostname + "/posts/" + id
+    dummy.value = copyText;
+    dummy.select();
+    dummy.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+}
+var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+var toastList = toastElList.map(function (toastEl) {
+  return new bootstrap.Toast(toastEl)
+})
+function showToast(){
+    toastList[0].show()
+}
+</script>

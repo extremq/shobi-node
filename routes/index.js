@@ -4,7 +4,7 @@ const router = express.Router()
 
 // Default Route
 router.get('/', (req, res) => {
-    res.render('index')
+    res.redirect('/posts')
 })
 
 module.exports = router

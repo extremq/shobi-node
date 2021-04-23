@@ -7,14 +7,20 @@ const router = express.Router()
 
 const imageMimeTypes = ['image/jpeg', 'image/png']
 
-const md = require('markdown-it')({
-    linkify: true,
-    typographer: true,
-    quotes: '“”‘’',
-})
+const { JSDOM } = require('jsdom')
+const md = require('marked')
+const createDomPurify = require('dompurify')
+const { route } = require('.')
+const dompurify = createDomPurify(new JSDOM().window)
 
 // All Posts Route
-router.get('/', async (req, res) => {
+router.get('/', async(req, res) => {
+    res.render('posts/index')
+})
+
+router.get('/page/:page', async (req, res) => {
+    itemsPerPage = 5
+    page = parseInt(req.params.page)
     let searchOptions = { }
     if (req.query.tags && req.query.tags.trim() != '') {
         tags = req.query.tags.match(/\S+/g) || []
@@ -33,13 +39,14 @@ router.get('/', async (req, res) => {
         searchOptions.markdown = { $regex: markdown, $options: 'i'}
     }
     try {
-        const posts = await Post.find(searchOptions)
-        posts.forEach(post => {
-            post.markdown = md.render(post.markdown)
-        })
-        res.render('posts/index', { 
+        const posts = await Post.find(searchOptions).sort({ createdAt: -1 })
+                                                    .skip(itemsPerPage * (page - 1))
+                                                    .limit(itemsPerPage)
+        res.render('posts/_posts', { 
+            layout: false,
             posts: posts, 
-            searchOptions: searchOptions
+            searchOptions: searchOptions,
+            page: page
         })
     } catch (e) {
         console.log(e)
@@ -53,10 +60,24 @@ router.get('/new', async (req, res) => {
     res.render('posts/new', { post: new Post() })
 })
 
+
+// New Post Route
+router.get('/:id/edit', async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id)
+        post.tags = post.tags.join(' ')
+        res.render('posts/edit', { post: post })
+    } catch (e) {
+        console.log(e)
+        res.redirect('/')
+    }
+})
+
+
 router.get('/:id', async (req, res) => {
     try {
         const post = await Post.findById(req.params.id)
-        post.markdown = md.render(post.markdown)
+        post.markdown = dompurify.sanitize(md(post.markdown))
         res.render('posts/post', { post })
     } catch {
         res.redirect('../posts')
@@ -93,8 +114,8 @@ router.post('/', async (req, res) => {
         author: "extremq",
         likers: []
     })
-    banner = saveBanner(post, req.body.banner)
     
+    banner = saveBanner(post, req.body.banner)
     // Invalid post types.
     if(post.description == '' && post.markdown != ''){
         await res.render('posts/new', {
@@ -117,14 +138,85 @@ router.post('/', async (req, res) => {
     else 
         try {
             const newPost = await post.save()
-            // res.redirect(`posts/${newPost.id}`)
-            res.redirect('posts')
+            res.redirect(`posts/${newPost.id}`)
         } catch {
             res.render('posts/new', {
                 post: post,
                 errorMessage: 'Error creating post.'
             })
         }
+})
+
+// Update Post Route
+router.put('/:id', async (req, res) => {
+    id = req.params.id
+    let oldPost
+    try {
+        oldPost = await Post.findById(id)
+    } catch (e) {
+        res.redirect('/posts', {
+            post: post,
+            errorMessage: 'Post does not exist.'
+        })
+    }
+    // Update the new post
+    title = req.body.title.trim().substring(0, 127)
+    description = req.body.description.trim().substring(0, 255)
+    markdown = req.body.markdown.trim().substring(0, 65535)
+    tags = req.body.tags.trim().substring(0, 63).match(/\S+/g) || []
+    banner = null
+    if (req.body.banner != null && req.body.banner !== '') {
+        oldBanner = oldPost.banner
+        oldEncoding = oldPost.bannerEncoding
+        banner = saveBanner(oldPost, req.body.banner)
+    }
+    
+    // Invalid post types.
+    if(description == '' && markdown != ''){
+        await res.render(`posts/edit`, {
+            post: oldPost,
+            errorMessage: 'You need to provide a description if you post text.'
+        })
+    }
+    else if(description == '' && markdown == '' && banner == null) {
+        res.render(`posts/edit`, {
+            post: oldPost,
+            errorMessage: 'You need to post an image if you dont have a description/text.'
+        })
+    }
+    else if(banner?.size > 2097152) {
+        oldPost.banner = oldBanner
+        oldPost.bannerEncoding = oldEncoding
+        res.render(`posts/edit`, {
+            post: oldPost,
+            errorMessage: 'The image is too big (max. 2MB).'
+        })
+    }
+    else 
+        try {
+            oldPost.title = title
+            oldPost.description = description
+            oldPost.markdown = markdown
+            oldPost.tags = tags
+            await oldPost.save()
+            res.redirect(`/posts/${id}`)
+        } catch {
+            res.render(`posts/edit`, {
+                post: oldPost,
+                errorMessage: 'Error creating post.'
+            })
+        }
+})
+
+// Delete post
+router.delete('/:id', async (req, res) => {
+    try {
+        post = await Post.findById(req.params.id)
+        await post.remove()
+    }
+    catch {
+    }
+    res.redirect('/posts')
 })
 
 module.exports = router

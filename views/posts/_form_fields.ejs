@@ -8,8 +8,14 @@
         <textarea class="form-control form-control-sm" style="resize: none;" type="text" name="description" maxlength="256"><%= post.description %></textarea>
     </div>
     <div class="col-12">
-        <label class="form-label">Text (supports markdown-it)</label>
-        <textarea onchange="showPreview()" class="form-control form-control-sm" type="text" name="markdown" maxlength="65536"><%= post.markdown %></textarea>
+        <label class="form-label">Text (supports <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" style="text-decoration: dotted underline;text-decoration-thickness: 1px;">markdown</a>)</label>
+        <textarea rows="5" id="markdown" oninput="showPreview()" class="form-control form-control-sm" type="text" name="markdown" maxlength="65536"><%= post.markdown %></textarea>
+    </div>
+    <div class="col-12">
+        <label class="form-label">Preview</label>
+        <div class="card">
+            <div class="preview card-body" id="preview"></div>
+        </div>
     </div>
     <div class="col-12">
         <label class="form-label">Tags</label>
@@ -18,3 +24,9 @@
     <label class="form-label">Banner (jpeg or png, max. 2MB)</label>
     <input class="filepond" type="file" name="banner">
 </div>
+<script>
+    function showPreview() {
+        console.log("lmao")
+        document.getElementById('preview').innerHTML = DOMPurify.sanitize(marked(document.getElementById("markdown").value))
+    }
+</script>

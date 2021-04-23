@@ -7,6 +7,8 @@ const express = require('express')
 const app = express()
 const expressLayouts = require('express-ejs-layouts')
 
+const methodOverride = require('method-override')
+
 const indexRouter = require('./routes/index')
 const postRouter = require('./routes/posts')
 
@@ -14,11 +16,11 @@ const postRouter = require('./routes/posts')
 app.set('view engine', 'ejs')
 app.set('views', __dirname + '/views')
 app.set('layout', 'layouts/layout')
+app.use(methodOverride('_method'))
 app.use(expressLayouts)
 app.use(express.json({limit: '50mb'}));
-app.use(express.urlencoded({limit: '50mb'}));
 app.use(express.static('public'))
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 
 // MongoDB
 const mongoose = require('mongoose')

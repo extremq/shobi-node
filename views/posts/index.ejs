@@ -93,7 +93,7 @@ function updatePosts(){
 function copyToClipboard(id) {
     var dummy = document.createElement("textarea");
     document.body.appendChild(dummy);
-    var copyText = window.location.hostname + "/posts/" + id
+    var copyText = "https://" + window.location.hostname + "/posts/" + id
     dummy.value = copyText;
     dummy.select();
     dummy.setSelectionRange(0, 99999);

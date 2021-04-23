@@ -56,7 +56,7 @@
 </div>
 <script>
 var page = 1
-var lastRequest = + new Date() - 1 * 1000
+var lastRequest = Date.now() - 1 * 1000
 var reachedEnd = false
 
 var mainLoopId = setInterval(function(){
@@ -68,20 +68,26 @@ $(window).scroll(function(){
 });
 
 function updatePosts(){
-    var aBot = $('#page').position().top + $('#page')[0].scrollHeight;
-    if(reachedEnd == false && $(window).scrollTop() + window.screen.height>= aBot && (+ new Date()) - lastRequest > 1 * 1000) {
-        lastRequest = + new Date()
+    var pageBottom = $('#page').position().top + $('#page')[0].scrollHeight;
+    var screenBottom = $(window).scrollTop() + window.screen.height;
+    if(
+        !reachedEnd &&
+        screenBottom >= pageBottom &&
+        Date.now() - lastRequest > 1 * 1000
+    ) {
+        lastRequest = Date.now()
         url = new URL(window.location.href)
         search = url.search
         $.ajax({
             method: "get",
             url: "/posts/page/" + page + search,
             success: function(response){
+                ongoingFeedRequest = false
                 page = page + 1
                 if (response.length < 64) {
                     reachedEnd = true
                     $('#spinner').remove()
-                } 
+                }
                 else {
                     $('.main-content').append(response)
                 }
@@ -89,7 +95,7 @@ function updatePosts(){
         });
     }
 }
-    
+
 function copyToClipboard(id) {
     var dummy = document.createElement("textarea");
     document.body.appendChild(dummy);

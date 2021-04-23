@@ -58,6 +58,7 @@
 var page = 1
 var lastRequest = Date.now() - 1 * 1000
 var reachedEnd = false
+var ongoingFeedRequest = false
 
 var mainLoopId = setInterval(function(){
     updatePosts()
@@ -71,10 +72,12 @@ function updatePosts(){
     var pageBottom = $('#page').position().top + $('#page')[0].scrollHeight;
     var screenBottom = $(window).scrollTop() + window.screen.height;
     if(
+        !ongoingFeedRequest &&
         !reachedEnd &&
         screenBottom >= pageBottom &&
         Date.now() - lastRequest > 1 * 1000
     ) {
+        ongoingFeedRequest = true
         lastRequest = Date.now()
         url = new URL(window.location.href)
         search = url.search

@@ -2,6 +2,7 @@ const express = require('express')
 const { now } = require('mongoose')
 
 const Post = require('../models/post')
+const User = require('../models/user')
 
 const router = express.Router()
 
@@ -12,6 +13,12 @@ const md = require('marked')
 const createDomPurify = require('dompurify')
 const { route } = require('.')
 const dompurify = createDomPurify(new JSDOM().window)
+
+async function getUserById(id) {
+    if (id)
+        return await User.findById(id)
+    return null
+}
 
 // All Posts Route
 router.get('/', async(req, res) => {
@@ -56,15 +63,18 @@ router.get('/page/:page', async (req, res) => {
 })
 
 // New Post Route
-router.get('/new', async (req, res) => {
+router.get('/new', onlyAuth, async (req, res) => {
     res.render('posts/new', { post: new Post() })
 })
 
 
 // New Post Route
-router.get('/:id/edit', async (req, res) => {
+router.get('/:id/edit', onlyAuth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id)
+        if (req.session?.passport?.user != post.author) {
+            res.redirect('/posts')
+        }
         post.tags = post.tags.join(' ')
         res.render('posts/edit', { post: post })
     } catch (e) {
@@ -103,15 +113,17 @@ function saveBanner(post, bannerEncoded) {
 }
 
 // Create Post Route
-router.post('/', async (req, res) => {
+router.post('/', onlyAuth, async (req, res) => {
     // Insert a new Post in our database.
+    creator = await getUserById(req.session?.passport?.user)
     const post = new Post({
         createdAt: new Date().toISOString(),
         title: req.body.title.trim().substring(0, 127),
         description: req.body.description.trim().substring(0, 255),
         markdown: req.body.markdown.trim().substring(0, 65535),
         tags: req.body.tags.trim().substring(0, 63).match(/\S+/g) || [],
-        author: "extremq",
+        author: creator,
+        authorName: creator.name,
         likers: []
     })
     
@@ -148,23 +160,27 @@ router.post('/', async (req, res) => {
 })
 
 // Update Post Route
-router.put('/:id', async (req, res) => {
+router.put('/:id', onlyAuth, async (req, res) => {
     id = req.params.id
     let oldPost
     try {
         oldPost = await Post.findById(id)
     } catch (e) {
-        res.redirect('/posts', {
-            post: post,
-            errorMessage: 'Post does not exist.'
-        })
+        console.log(e)
+        res.redirect('/posts')
     }
+    if (req.session?.passport?.user != oldPost.author) {
+        res.redirect('/posts')
+        return
+    }
+
     // Update the new post
     title = req.body.title.trim().substring(0, 127)
     description = req.body.description.trim().substring(0, 255)
     markdown = req.body.markdown.trim().substring(0, 65535)
     tags = req.body.tags.trim().substring(0, 63).match(/\S+/g) || []
     banner = null
+
     if (req.body.banner != null && req.body.banner !== '') {
         oldBanner = oldPost.banner
         oldEncoding = oldPost.bannerEncoding
@@ -173,7 +189,7 @@ router.put('/:id', async (req, res) => {
     
     // Invalid post types.
     if(description == '' && markdown != ''){
-        await res.render(`posts/edit`, {
+        res.render(`posts/edit`, {
             post: oldPost,
             errorMessage: 'You need to provide a description if you post text.'
         })
@@ -209,14 +225,31 @@ router.put('/:id', async (req, res) => {
 })
 
 // Delete post
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', onlyAuth, async (req, res) => {
     try {
         post = await Post.findById(req.params.id)
+        if (req.session?.passport?.user != post.author) {
+            res.redirect('/posts')
+        }
         await post.remove()
     }
     catch {
     }
     res.redirect('/posts')
 })
+
+function onlyAuth(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next()
+    }
+    res.redirect('/login')
+}
+
+function onlyNotAuth(req, res, next) {
+    if (!req.isAuthenticated()) {
+        return next()
+    }
+    res.redirect('/posts')
+}
 
 module.exports = router

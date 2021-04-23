@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="card mb-3" style="max-width: 600px; margin: auto">
+        <div class="card-body">
+            <h1 class="display-6 card-title mb-3" style="text-align: center;">Register </h1>
+            <hr>
+            <form action="/register" method="post">
+            <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Username</label>
+                        <input name="name" type="text" class="form-control form-control-sm" maxlength="16" placeholder="Enter your username">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">E-mail adress</label>
+                        <input name="email" type="email" class="form-control form-control-sm" maxlength="64" placeholder="Enter your e-mail adress">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Password</label>
+                        <input name="password" type="password" class="form-control form-control-sm" minlength="8" maxlength="64" placeholder="Enter your password">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-outline-success btn-sm" type="submit">Create <i class="fa fa-user-plus fa-sm"></i></button>
+                        <a class="btn btn-outline-secondary btn-sm" href="/login">Login instead</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -32,6 +32,11 @@ const postSchema = new mongoose.Schema({
         required: false
     },
     author: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+        required: true
+    },
+    authorName: {
         type: String,
         required: true
     },

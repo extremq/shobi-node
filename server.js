@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Express
 const express = require('express')
-const app = express()
+const app = require('./app')
 const expressLayouts = require('express-ejs-layouts')
 
 const methodOverride = require('method-override')
@@ -35,3 +35,5 @@ app.use('/', indexRouter)
 app.use('/posts', postRouter)
 
 app.listen(process.env.PORT || 3000)
+
+module.exports = app

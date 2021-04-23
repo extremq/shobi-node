@@ -1,19 +1,19 @@
 <div class="container mb-4">
-    <div class="card" style="max-width: 500px; margin: auto">
+    <div class="card" style="max-width: 600px; margin: auto">
         <% if (post.banner && post.bannerEncoding) { %>
-        <img src="<%= `data:${post.bannerEncoding};charset=utf-8;base64,${post.banner.toString('base64')}` %>" style="max-width: 500px;">
+        <img src="<%= `data:${post.bannerEncoding};charset=utf-8;base64,${post.banner.toString('base64')}` %>" style="max-width: 75%; min-width: fit-content;;">
         <% } %>
         <div class="card-body">
             <h3 class="card-title" style="text-align: center;"><i><%= post.title %></i></h3>
-            <p class="card-subtitle text-muted" style="text-align: center;">by <%= post.author %> on <%= post.createdAt.split('T')[0] %>.</p>
+            <p class="card-subtitle text-muted mb-3" style="text-align: center;">by <%= post.authorName %> on <%= post.createdAt.split('T')[0] %>.</p>
             
             <form class="row justify-content-md-center row-cols-lg-auto g-1 align-items-center" method="post" action="<%= post.id %>?_method=DELETE">
                 <div class="col-12">
                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="showToast();copyToClipboard('<%= post.id %>')" id="<%= post.id %>">Copy <i class="fa fa-link fa-sm"></i></button>
                 </div>
-                <% if (post.author == "extremq") { %>
+                <% if (post.authorName == user?.name) { %>
                     <div class="col-12">
-                        <a class="btn btn-sm btn-outline-success" href="<%= post.id %>/edit">Edit <i class="far fa-sm fa-edit"></i></a>
+                        <a class="btn btn-sm btn-outline-primary" href="<%= post.id %>/edit">Edit <i class="far fa-sm fa-edit"></i></a>
                     </div>
                     <div class="col-12">
                         <button class="btn btn-sm btn-outline-danger" type="submit">Delete <i class="far fa-sm fa-trash-alt"></i></button>

@@ -84,12 +84,20 @@ function updatePosts(){
         $.ajax({
             method: "get",
             url: "/posts/page/" + page + search,
-            success: function(response){
+            success: function(response, textStatus, jqXHR){
                 ongoingFeedRequest = false
                 page = page + 1
-                if (response.length < 64) {
+
+                var postsCount = parseInt(jqXHR.getResponseHeader("x-post-count"))
+
+                if (postsCount == 0) {
                     reachedEnd = true
                     $('#spinner').remove()
+                }
+                else if (postsCount == -1) {
+                    // Internal server error.
+                    // Give a little grace period (3s total) to cool things down!
+                    lastRequest = Date.now() + 2 * 1000
                 }
                 else {
                     $('.main-content').append(response)

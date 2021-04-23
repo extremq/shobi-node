@@ -49,17 +49,19 @@ router.get('/page/:page', async (req, res) => {
         const posts = await Post.find(searchOptions).sort({ createdAt: -1 })
                                                     .skip(itemsPerPage * (page - 1))
                                                     .limit(itemsPerPage)
-        res.render('posts/_posts', { 
+        res.set("x-post-count", posts.length)
+        res.render('posts/_posts', {
             layout: false,
-            posts: posts, 
+            posts: posts,
             searchOptions: searchOptions,
             page: page
         })
     } catch (e) {
         console.log(e)
+        res.set("x-post-count", -1)
         res.redirect('/')
     }
-    
+
 })
 
 // New Post Route
@@ -126,7 +128,7 @@ router.post('/', onlyAuth, async (req, res) => {
         authorName: creator.name,
         likers: []
     })
-    
+
     banner = saveBanner(post, req.body.banner)
     // Invalid post types.
     if(post.description == '' && post.markdown != ''){
@@ -147,7 +149,7 @@ router.post('/', onlyAuth, async (req, res) => {
             errorMessage: 'The image is too big (max. 2MB).'
         })
     }
-    else 
+    else
         try {
             const newPost = await post.save()
             res.redirect(`posts/${newPost.id}`)
@@ -186,7 +188,7 @@ router.put('/:id', onlyAuth, async (req, res) => {
         oldEncoding = oldPost.bannerEncoding
         banner = saveBanner(oldPost, req.body.banner)
     }
-    
+
     // Invalid post types.
     if(description == '' && markdown != ''){
         res.render(`posts/edit`, {
@@ -208,7 +210,7 @@ router.put('/:id', onlyAuth, async (req, res) => {
             errorMessage: 'The image is too big (max. 2MB).'
         })
     }
-    else 
+    else
         try {
             oldPost.title = title
             oldPost.description = description

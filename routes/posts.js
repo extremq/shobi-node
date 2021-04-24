@@ -120,7 +120,8 @@ router.post('/', onlyAuth, async (req, res) => {
         tags: req.body.tags.trim().substring(0, 63).match(/\S+/g) || [],
         author: creator,
         authorName: creator.name,
-        likers: []
+        likers: [],
+        comments: []
     })
 
     // Invalid post types.

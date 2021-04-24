@@ -1,29 +1,29 @@
 <div class="container">
     <div class="card mb-3" style="max-width: 600px; margin: auto">
-        <div class="card-body">
+        <div class="card-body shadow">
             <h1 class="display-6 card-title mb-3" style="text-align: center;">Register </h1>
             <hr>
             <form action="/register" method="post">
             <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label">Username</label>
-                        <input name="name" type="text" class="form-control form-control-sm" maxlength="16" placeholder="Enter your username">
+                        <input name="name" type="text" class="form-control form-control-sm shadow-sm" maxlength="16" placeholder="Enter your username">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">E-mail adress</label>
-                        <input name="email" type="email" class="form-control form-control-sm" maxlength="64" placeholder="Enter your e-mail adress">
+                        <input name="email" type="email" class="form-control form-control-sm shadow-sm" maxlength="64" placeholder="Enter your e-mail adress">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Password</label>
-                        <input name="password" type="password" class="form-control form-control-sm" minlength="8" maxlength="64" placeholder="Enter your password">
+                        <input name="password" type="password" class="form-control form-control-sm shadow-sm" minlength="8" maxlength="64" placeholder="Enter your password">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Authentication key</label>
-                        <input name="key" type="password" class="form-control form-control-sm" placeholder="Enter an authentication key">
+                        <input name="key" type="password" class="form-control form-control-sm shadow-sm" placeholder="Enter an authentication key">
                     </div>
                     <div class="col-12">
-                        <button class="btn btn-outline-success btn-sm" type="submit">Create <i class="fa fa-user-plus fa-sm"></i></button>
-                        <a class="btn btn-outline-secondary btn-sm" href="/login">Login instead</a>
+                        <button class="btn btn-outline-success btn-sm shadow-sm" type="submit">Create <i class="fa fa-user-plus fa-sm"></i></button>
+                        <a class="btn btn-outline-secondary btn-sm shadow-sm" href="/login">Login instead</a>
                     </div>
                 </div>
             </form>

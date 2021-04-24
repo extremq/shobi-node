@@ -1,7 +1,7 @@
 <% let i = 0 %>
 <% posts.forEach(post => { %>
     <% i = i + 1 %>
-    <div class="card mb-3" style="max-width: 600px; margin:auto">
+    <div class="card mb-3 shadow" style="max-width: 600px; margin:auto">
         <% if (post.banner?.length > 5) { %>
         <img src="<%= post.banner %>" style="max-width: 600px;">
         <% } %>
@@ -9,21 +9,21 @@
             <h5 class="card-title"><%= post.title %></h5>
             <h6 class="card-subtitle text-muted mb-2">by @<%= post.authorName %> on <%= post.createdAt.split('T')[0] %>.</h6>
             <p class="card-text"><%= post.description %></p>
-            <form class="row row-cols-lg-auto g-1 align-items-center" method="post" action="posts/<%= post.id %>?_method=DELETE">
+            <form class="d-flex justify-content-left card-text" method="post" action="posts/<%= post.id %>?_method=DELETE">
                 <% if (post.markdown) { %>
-                <div class="col-12">
-                    <a class="btn btn-sm btn-outline-primary" href="posts/<%= post.id %>">Read the post <i class="far fa-sm fa-file-alt"></i></a>
+                <div class="d-inline m-1">
+                    <a class="btn btn-sm btn-outline-primary shadow-sm" href="posts/<%= post.id %>">Read the post <i class="far fa-sm fa-file-alt"></i></a>
                 </div>
                 <% } %>
-                <div class="col-12">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="showToast();copyToClipboard('<%= post.id %>')" id="<%= post.id %>">Copy <i class="fa fa-link fa-sm"></i></button>
+                <div class="d-inline m-1">
+                    <button type="button" class="btn btn-sm btn-outline-secondary shadow-sm" onclick="showToast();copyToClipboard('<%= post.id %>')" id="<%= post.id %>">Copy <i class="fa fa-link fa-sm"></i></button>
                 </div>
                 <% if (post.authorName == user?.name || user?.name == admin) { %>
-                    <div class="col-12">
-                        <a class="btn btn-sm btn-outline-success" href="posts/<%= post.id %>/edit">Edit <i class="far fa-sm fa-edit"></i></a>
+                    <div class="d-inline m-1">
+                        <a class="btn btn-sm btn-outline-success shadow-sm" href="posts/<%= post.id %>/edit">Edit <i class="far fa-sm fa-edit"></i></a>
                     </div>
-                    <div class="col-12">
-                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete <i class="far fa-sm fa-trash-alt"></i></button>
+                    <div class="d-inline m-1">
+                        <button class="btn btn-sm btn-outline-danger shadow-sm" type="submit">Delete <i class="far fa-sm fa-trash-alt"></i></button>
                     </div>
                 <% } %>
             </form>

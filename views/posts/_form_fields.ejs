@@ -1,28 +1,28 @@
 <div class="row g-3">
     <div class="col-md-6">
         <label class="form-label">Title</label>
-        <textarea class="form-control form-control-sm" style="resize: none;" type="text" name="title" maxlength="128" placeholder="Why I love cats" required><%= post.title %></textarea>
+        <textarea class="form-control form-control-sm shadow-sm" style="resize: none;" type="text" name="title" maxlength="128" placeholder="Why I love cats" required><%= post.title %></textarea>
     </div>
     <div class="col-md-6">
         <label class="form-label">Description</label>
-        <textarea class="form-control form-control-sm" style="resize: none;" type="text" name="description" maxlength="256" placeholder="In this post I will discuss about cats."><%= post.description %></textarea>
+        <textarea class="form-control form-control-sm shadow-sm" style="resize: none;" type="text" name="description" maxlength="256" placeholder="In this post I will discuss about cats."><%= post.description %></textarea>
     </div>
     <div class="col-12">
         <label class="form-label">Text (supports <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" style="text-decoration: dotted underline;text-decoration-thickness: 1px;">markdown</a>)</label>
-        <textarea rows="5" id="markdown" oninput="showPreview()" class="form-control form-control-sm" type="text" name="markdown" maxlength="65536" placeholder="# Hello, I support **markdown**!"><%= post.markdown %></textarea>
+        <textarea rows="5" id="markdown" oninput="showPreview()" class="shadow-sm form-control form-control-sm" type="text" name="markdown" maxlength="65536" placeholder="# Hello, I support **markdown**!"><%= post.markdown %></textarea>
     </div>
     <div class="col-12">
         <label class="form-label">Preview</label>
         <div class="card">
-            <div class="preview card-body" id="preview"></div>
+            <div class="preview card-body shadow-sm" id="preview"></div>
         </div>
     </div>
     <div class="col-12">
         <label class="form-label">Tags</label>
-        <input class="form-control form-control-sm" type="text" name="tags" pattern="^[a-z0-9_\-\s]{0,63}$" title="Enter characters from a-z, 0-9, - or _." maxlength="64" placeholder="Enter tags separated by one space" value="<%= post.tags %>">
+        <input class="form-control form-control-sm shadow-sm" type="text" name="tags" pattern="^[a-z0-9_\-\s]{0,63}$" title="Enter characters from a-z, 0-9, - or _." maxlength="64" placeholder="Enter tags separated by one space" value="<%= post.tags %>">
     </div>
     <label class="form-label">Banner (jpeg or png, max. 10MB)</label>
-    <input class="filepond" type="file" name="banner">
+    <input class="filepond shadow-sm" type="file" name="banner">
 </div>
 <script>
     function showPreview() {

@@ -1,12 +1,12 @@
 <div class="container">
     <h3 class="display-6" style="text-align: center;">Edit Post</h2>
     <form name="editPost" action="/posts/<%= post.id %>?_method=PUT" method="post">
-        <div class="card" style="max-width: 600px; margin:auto">
+        <div class="card shadow" style="max-width: 600px; margin:auto">
             <div class="card-body">
                 <%- include('_form_fields') %>
                 <div class="mt-3">
-                    <a class="btn btn-sm btn-outline-danger" href="/posts">Cancel</a>
-                    <button class="btn btn-sm btn-outline-success" type="submit">Update <i class="fa-sm fa fa-check"></i></button>
+                    <a class="btn btn-sm btn-outline-danger shadow-sm" href="/posts">Cancel</a>
+                    <button class="btn btn-sm btn-outline-success shadow-sm" type="submit">Update <i class="fa-sm fa fa-check"></i></button>
                 </div>
             </div>
         </div>

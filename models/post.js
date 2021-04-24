@@ -41,6 +41,10 @@ const postSchema = new mongoose.Schema({
     likers: {
         type: Array,
         required: true 
+    },
+    comments: {
+        type: Array,
+        required: true
     }
 })
 

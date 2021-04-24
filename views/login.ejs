@@ -1,6 +1,6 @@
 <% if (messages.error != null) { %> 
     <div class="container">
-        <div class="card border-danger mb-3" style="max-width: 600px; margin:auto">
+        <div class="card border-danger mb-3 shadow-sm" style="max-width: 600px; margin:auto">
             <div class="card-body text-danger">
                 <p class="card-text" style="text-align: center;"><%= messages.error %></p>
             </div>
@@ -8,7 +8,7 @@
     </div>
 <% } %> 
 <div class="container">
-    <div class="card mb-3" style="max-width: 600px; margin: auto">
+    <div class="card mb-3 shadow" style="max-width: 600px; margin: auto">
         <div class="card-body">
             <h1 class="display-6 card-title mb-3" style="text-align: center;">Login </h1>
             <hr>
@@ -16,15 +16,15 @@
             <div class="row g-3">
                     <div class="col-12">
                         <label class="form-label">Username</label>
-                        <input name="name" type="text" class="form-control form-control-sm" maxlength="16" placeholder="Enter your username">
+                        <input name="name" type="text" class="form-control form-control-sm shadow-sm" maxlength="16" placeholder="Enter your username">
                     </div>
                     <div class="col-12">
                         <label class="form-label">Password</label>
-                        <input name="password" type="password" class="form-control form-control-sm" minlength="8" maxlength="64" placeholder="Enter your password">
+                        <input name="password" type="password" class="form-control form-control-sm shadow-sm" minlength="8" maxlength="64" placeholder="Enter your password">
                     </div>
                     <div class="col-12">
-                        <button class="btn btn-outline-primary btn-sm" type="submit">Login <i class="fa fa-sign-in-alt fa-sm"></i></button>
-                        <a class="btn btn-outline-secondary btn-sm" href="/register">Register instead</a>
+                        <button class="btn btn-outline-primary btn-sm shadow-sm" type="submit">Login <i class="fa fa-sign-in-alt fa-sm"></i></button>
+                        <a class="btn btn-outline-secondary btn-sm shadow-sm" href="/register">Register instead</a>
                     </div>
                 </div>
             </form>

@@ -7,7 +7,7 @@
         <% } %>
         <div class="card-body">
             <h5 class="card-title"><%= post.title %></h5>
-            <h6 class="card-subtitle text-muted mb-2">by <%= post.authorName %> on <%= post.createdAt.split('T')[0] %>.</h6>
+            <h6 class="card-subtitle text-muted mb-2">by @<%= post.authorName %> on <%= post.createdAt.split('T')[0] %>.</h6>
             <p class="card-text"><%= post.description %></p>
             <form class="row row-cols-lg-auto g-1 align-items-center" method="post" action="posts/<%= post.id %>?_method=DELETE">
                 <% if (post.markdown) { %>

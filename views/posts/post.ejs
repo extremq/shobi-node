@@ -6,7 +6,7 @@
         <div class="card-body">
             <h3 class="card-title display-6" style="text-align: center;"><%= post.title %></h3>
             <p class="text-muted mb-3"style="text-align: center;"><%= post.description %></p>
-            <p class="card-subtitle text-muted mb-3" style="text-align: center;">by <%= post.authorName %> on <%= post.createdAt.split('T')[0] %>.</p>
+            <p class="card-subtitle text-muted mb-3" style="text-align: center;">Created by @<%= post.authorName %> on <%= post.createdAt.split('T')[0] %>.</p>
             
             <form class="row justify-content-md-center row-cols-lg-auto g-1 align-items-center" method="post" action="<%= post.id %>?_method=DELETE">
                 <div class="col-12">

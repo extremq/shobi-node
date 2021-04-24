@@ -56,8 +56,9 @@
 </div>
 <script>
 var page = 1
-var lastRequest = + new Date() - 1 * 1000
+var lastRequest = Date.now() - 1 * 1000
 var reachedEnd = false
+var ongoingFeedRequest = false
 
 var mainLoopId = setInterval(function(){
     updatePosts()
@@ -68,20 +69,36 @@ $(window).scroll(function(){
 });
 
 function updatePosts(){
-    var aBot = $('#page').position().top + $('#page')[0].scrollHeight;
-    if(reachedEnd == false && $(window).scrollTop() + window.screen.height>= aBot && (+ new Date()) - lastRequest > 1 * 1000) {
-        lastRequest = + new Date()
+    var pageBottom = $('#page').position().top + $('#page')[0].scrollHeight;
+    var screenBottom = $(window).scrollTop() + window.screen.height;
+    if(
+        !ongoingFeedRequest &&
+        !reachedEnd &&
+        screenBottom >= pageBottom &&
+        Date.now() - lastRequest > 1 * 1000
+    ) {
+        ongoingFeedRequest = true
+        lastRequest = Date.now()
         url = new URL(window.location.href)
         search = url.search
         $.ajax({
             method: "get",
             url: "/posts/page/" + page + search,
-            success: function(response){
+            success: function(response, textStatus, jqXHR){
+                ongoingFeedRequest = false
                 page = page + 1
-                if (response.length < 64) {
+
+                var postsCount = parseInt(jqXHR.getResponseHeader("x-post-count"))
+
+                if (postsCount == 0) {
                     reachedEnd = true
                     $('#spinner').remove()
-                } 
+                }
+                else if (postsCount == -1) {
+                    // Internal server error.
+                    // Give a little grace period (3s total) to cool things down!
+                    lastRequest = Date.now() + 2 * 1000
+                }
                 else {
                     $('.main-content').append(response)
                 }
@@ -89,7 +106,7 @@ function updatePosts(){
         });
     }
 }
-    
+
 function copyToClipboard(id) {
     var dummy = document.createElement("textarea");
     document.body.appendChild(dummy);

@@ -1,15 +1,15 @@
 <div class="row g-3">
     <div class="col-md-6">
         <label class="form-label">Title</label>
-        <textarea class="form-control form-control-sm" style="resize: none;" type="text" name="title" maxlength="128" required><%= post.title %></textarea>
+        <textarea class="form-control form-control-sm" style="resize: none;" type="text" name="title" maxlength="128" placeholder="Why I love cats" required><%= post.title %></textarea>
     </div>
     <div class="col-md-6">
         <label class="form-label">Description</label>
-        <textarea class="form-control form-control-sm" style="resize: none;" type="text" name="description" maxlength="256"><%= post.description %></textarea>
+        <textarea class="form-control form-control-sm" style="resize: none;" type="text" name="description" maxlength="256" placeholder="In this post I will discuss about cats."><%= post.description %></textarea>
     </div>
     <div class="col-12">
         <label class="form-label">Text (supports <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" style="text-decoration: dotted underline;text-decoration-thickness: 1px;">markdown</a>)</label>
-        <textarea rows="5" id="markdown" oninput="showPreview()" class="form-control form-control-sm" type="text" name="markdown" maxlength="65536"><%= post.markdown %></textarea>
+        <textarea rows="5" id="markdown" oninput="showPreview()" class="form-control form-control-sm" type="text" name="markdown" maxlength="65536" placeholder="# Hello, I support **markdown**!"><%= post.markdown %></textarea>
     </div>
     <div class="col-12">
         <label class="form-label">Preview</label>
@@ -26,7 +26,6 @@
 </div>
 <script>
     function showPreview() {
-        console.log("lmao")
         document.getElementById('preview').innerHTML = DOMPurify.sanitize(marked(document.getElementById("markdown").value))
     }
 </script>

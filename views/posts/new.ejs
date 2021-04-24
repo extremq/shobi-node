@@ -1,5 +1,27 @@
 <div class="container">
     <h3 class="display-6" style="text-align: center;">New Post</h2>
+        <div class="accordion mb-3" id="accordionExample" style="max-width: 600px; margin:auto">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Read this before posting.
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <p>Please post nice things. Be <u>respectful</u> of others.</p>
+                        <p>For a post to be valid, it needs to check one of these points:</p>
+                        <ul>
+                            <li>Have text and a description.</li>
+                            <li>Have a banner.</li>
+                            <li>Any other <abbr title="Description and banner, text and banner or all three.">combination</abbr> of the above two.</li>
+                        </ul>
+                        <p><strong>You can post pictures inside the text.</strong> Check the  <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" style="text-decoration: dotted underline;text-decoration-thickness: 1px;">markdown</a> guide.</p>
+                        <p>Lastly, have fun!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     <form name="postCreation" action="/posts" method="post">
         <div class="card" style="max-width: 600px; margin:auto">
             <div class="card-body">

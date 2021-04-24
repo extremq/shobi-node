@@ -1,0 +1,9 @@
+<div class="card-body">
+    <h5 class="card-title"><i class="fa fa fa-hashtag"></i> Tagged posts: <strong><%= count %></strong></h5>
+    <ul>
+    <% let i = 0 %>
+    <% for(const tag in tags) { %>
+        <li><a href="/posts?tags=<%= tag %>"><%= tag %></a> (<%= tags[tag] %>)</li>
+    <% } %>
+    </ul>
+</div>

@@ -29,6 +29,27 @@ router.get('/', async(req, res) => {
     res.render('posts/index')
 })
 
+router.get('/tags', async (req, res) => {
+    let siteTags = { }
+    tagCount = 0
+    posts = await Post.find({})
+    posts.forEach(post => {
+        if (post.tags.length > 0) tagCount += 1
+        post.tags.forEach(tag => {
+            if (siteTags[tag] == null) siteTags[tag] = 1
+            else siteTags[tag] += 1
+        });
+    });
+    siteTags = Object.fromEntries(
+        Object.entries(siteTags).sort(([,a],[,b]) => b-a)
+    );
+    res.render('posts/_tags', {
+        layout: false,
+        tags: siteTags,
+        count: tagCount
+    })
+})
+
 router.get('/page/:page', async (req, res) => {
     itemsPerPage = 5
     page = parseInt(req.params.page)
@@ -105,6 +126,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', onlyAuth, async (req, res) => {
     let banner
     try {
+        if (banner?.length > 10)
         banner = JSON.parse(req.body.banner)
     }
     catch (e){
@@ -123,6 +145,7 @@ router.post('/', onlyAuth, async (req, res) => {
         likers: [],
         comments: []
     })
+    post.tags = [...new Set(post.tags)];
 
     // Invalid post types.
     if(post.description == '' && post.markdown != ''){
@@ -145,7 +168,7 @@ router.post('/', onlyAuth, async (req, res) => {
     }
     else
         try {
-            if (banner !== null) {
+            if (banner != null) {
                 let imgurPost
                 fetch("https://api.imgur.com/3/image", {
                     method: "POST",
@@ -153,7 +176,7 @@ router.post('/', onlyAuth, async (req, res) => {
                             "Content-Type": "application/x-www-form-urlencoded",
                             "Authorization": "Client-ID 0822748160b706a"
                         },
-                    body: `type=base64&image=${encodeURIComponent(banner.data)}`
+                    body: `type=base64&image=${encodeURIComponent(banner?.data)}`
                     }).then((resp) => resp.json()).then(async (data) => {
                         post.banner = data.data.link
                         post.deleteHash = data.data.deletehash
@@ -182,6 +205,7 @@ router.post('/', onlyAuth, async (req, res) => {
 router.put('/:id', onlyAuth, async (req, res) => {
     let banner
     try {
+        if (banner?.length > 10)
         banner = JSON.parse(req.body.banner)
     }
     catch (e){
@@ -206,6 +230,7 @@ router.put('/:id', onlyAuth, async (req, res) => {
     description = req.body.description.trim().substring(0, 255)
     markdown = req.body.markdown.trim().substring(0, 65535)
     tags = req.body.tags.trim().substring(0, 63).match(/\S+/g) || []
+    tags = [...new Set(tags)];
 
     // Invalid post types.
     if(description == '' && markdown != ''){
@@ -240,7 +265,7 @@ router.put('/:id', onlyAuth, async (req, res) => {
                             "Content-Type": "application/x-www-form-urlencoded",
                             "Authorization": "Client-ID " + process.env.IMGUR_ID
                         },
-                    body: `type=base64&image=${encodeURIComponent(banner.data)}`
+                    body: `type=base64&image=${encodeURIComponent(banner?.data)}`
                     }).then((resp) => resp.json()).then(async (data) => {
                         post.banner = data.data.link
                         post.deleteHash = data.data.deletehash

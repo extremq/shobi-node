@@ -1,56 +1,71 @@
-<div class="container" id="page">
-<form action="/posts" method="get">
-    <div class="accordion" id="accordionExample" style="max-width: 600px; margin:auto">
-        <div class="accordion-item shadow-sm">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                Search posts
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">By title</label>
-                            <input class="form-control form-control-sm shadow-sm" type="text" name="title" value="">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">By description</label>
-                            <input class="form-control form-control-sm shadow-sm" type="text" name="description" value="">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">By text</label>
-                            <input class="form-control form-control-sm shadow-sm" type="text" name="markdown" value="">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">By tag</label>
-                            <input class="form-control form-control-sm shadow-sm" type="text" name="tags" pattern="[a-z0-9_- ]+" value="">
-                        </div>
-                        <div class="col-12">
-                            <button class="btn btn-outline-success btn-sm shadow-sm" type="submit">Search <i class="fa fa-sm fa-search"></i></button>
-                            <a class="btn btn-outline-danger btn-sm shadow-sm" href="/posts">Clear filter <i class="far fa-sm fa-trash-alt"></i></a>
+
+<div class="container" id="page" style="max-width: 1145px;">
+    <div id="tags" class="shadow-sm position-fixed card d-none d-xl-block align-self-start mx-3" style="width: 230px; top: 96px">
+        
+    </div>  
+    <div class="m-auto">
+        <form action="/posts" method="get">
+            <div class="accordion" id="accordionExample" style="max-width: 600px; margin:auto">
+                <div class="accordion-item shadow-sm">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Search posts
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">By title</label>
+                                    <input class="form-control form-control-sm shadow-sm" type="text" name="title" value="">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">By description</label>
+                                    <input class="form-control form-control-sm shadow-sm" type="text" name="description" value="">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">By text</label>
+                                    <input class="form-control form-control-sm shadow-sm" type="text" name="markdown" value="">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">By tag</label>
+                                    <input class="form-control form-control-sm shadow-sm" type="text" name="tags" pattern="[a-z0-9_- ]+" value="">
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-outline-success btn-sm shadow-sm" type="submit">Search <i class="fa fa-sm fa-search"></i></button>
+                                    <a class="btn btn-outline-danger btn-sm shadow-sm" href="/posts">Clear filter <i class="far fa-sm fa-trash-alt"></i></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </form>
+        <div class="main-content">
+            <!-- content to be added here -->
         </div>
     </div>
-</form>
+    
+    <div id="tags" class="position-sticky invisible  card d-none d-xl-block align-self-start mx-3" style="width: 230px">
+        <div class="card-body">
+            <p class="card-title">Tags</p>
+            
+        </div>
+    </div>
 
-<div class="main-content">
-    <!-- content to be added here -->
-</div>
-<div id="spinner" class="mb-3" style="text-align: center;">
-    <i class="fas fa-fan fa-2x fa-spin"></i>
-</div>
+    
+    <div id="spinner" class="mb-3" style="text-align: center;">
+        <i class="fas fa-fan fa-2x fa-spin"></i>
+    </div>
 
-<div class="position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 5">
-    <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body">
-                Link copied to clipboard.
+    <div class="position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 5">
+        <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Link copied to clipboard.
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
 </div>
@@ -63,6 +78,14 @@ var ongoingFeedRequest = false
 var mainLoopId = setInterval(function(){
     updatePosts()
 }, 1000);
+
+$.ajax({
+    method: "get",
+    url: "/posts/tags",
+    success: function(response, textStatus){
+        $('#tags').append(response)
+    }
+});
 
 $(window).scroll(function(){
     updatePosts()

@@ -6,7 +6,11 @@ const User = require('../models/user')
 
 const router = express.Router()
 
-const imageMimeTypes = ['image/jpeg', 'image/png']
+const imgur = require('imgur');
+imgur.setClientId(process.env.IMGUR_ID)
+imgur.setAPIUrl('https://api.imgur.com/3/')
+
+const fetch = require('node-fetch');
 
 const { JSDOM } = require('jsdom')
 const md = require('marked')
@@ -74,8 +78,9 @@ router.get('/new', onlyAuth, async (req, res) => {
 router.get('/:id/edit', onlyAuth, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id)
-        if (req.session?.passport?.user != post.author) {
+        if (req.session?.passport?.user != post.author && process.env.ADMIN_ID != req.session?.passport?.user) {
             res.redirect('/posts')
+            return
         }
         post.tags = post.tags.join(' ')
         res.render('posts/edit', { post: post })
@@ -96,26 +101,15 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-function saveBanner(post, bannerEncoded) {
-    if (bannerEncoded == null) {
-        return
-    }
-    banner = null
-    try {
-        banner = JSON.parse(bannerEncoded)
-        if (banner != null && imageMimeTypes.includes(banner.type)) {
-            post.banner = new Buffer.from(banner.data, 'base64')
-            post.bannerEncoding = banner.type
-        }
-    }
-    catch {
-
-    }
-    return banner
-}
-
 // Create Post Route
 router.post('/', onlyAuth, async (req, res) => {
+    let banner
+    try {
+        banner = JSON.parse(req.body.banner)
+    }
+    catch (e){
+        console.log(e)
+    }
     // Insert a new Post in our database.
     creator = await getUserById(req.session?.passport?.user)
     const post = new Post({
@@ -129,7 +123,6 @@ router.post('/', onlyAuth, async (req, res) => {
         likers: []
     })
 
-    banner = saveBanner(post, req.body.banner)
     // Invalid post types.
     if(post.description == '' && post.markdown != ''){
         await res.render('posts/new', {
@@ -143,17 +136,40 @@ router.post('/', onlyAuth, async (req, res) => {
             errorMessage: 'You need to post an image if you dont have a description/text.'
         })
     }
-    else if(banner?.size > 2097152) {
+    else if(banner?.size > 10485760) {
         res.render('posts/new', {
             post: post,
-            errorMessage: 'The image is too big (max. 2MB).'
+            errorMessage: 'The image is too big (max. 10MB).'
         })
     }
     else
         try {
-            const newPost = await post.save()
-            res.redirect(`posts/${newPost.id}`)
-        } catch {
+            if (banner !== null) {
+                let imgurPost
+                fetch("https://api.imgur.com/3/image", {
+                    method: "POST",
+                    headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "Authorization": "Client-ID 0822748160b706a"
+                        },
+                    body: `type=base64&image=${encodeURIComponent(banner.data)}`
+                    }).then((resp) => resp.json()).then(async (data) => {
+                        post.banner = data.data.link
+                        post.deleteHash = data.data.deletehash
+                        const newPost = await post.save()
+                        res.redirect(`posts/${newPost.id}`)
+                        return
+                    }).catch((err) => {
+                        console.error(err)
+                })
+            }
+            else {
+                const newPost = await post.save()
+                res.redirect(`posts/${newPost.id}`)
+                return
+            }
+        } catch (err) {
+            console.error(err)
             res.render('posts/new', {
                 post: post,
                 errorMessage: 'Error creating post.'
@@ -163,15 +179,23 @@ router.post('/', onlyAuth, async (req, res) => {
 
 // Update Post Route
 router.put('/:id', onlyAuth, async (req, res) => {
-    id = req.params.id
-    let oldPost
+    let banner
     try {
-        oldPost = await Post.findById(id)
+        banner = JSON.parse(req.body.banner)
+    }
+    catch (e){
+        console.log(e)
+    }
+    id = req.params.id
+    let post
+    try {
+        post = await Post.findById(id)
     } catch (e) {
         console.log(e)
         res.redirect('/posts')
+        return
     }
-    if (req.session?.passport?.user != oldPost.author) {
+    if (req.session?.passport?.user != post.author && process.env.ADMIN_ID != req.session?.passport?.user) {
         res.redirect('/posts')
         return
     }
@@ -181,46 +205,59 @@ router.put('/:id', onlyAuth, async (req, res) => {
     description = req.body.description.trim().substring(0, 255)
     markdown = req.body.markdown.trim().substring(0, 65535)
     tags = req.body.tags.trim().substring(0, 63).match(/\S+/g) || []
-    banner = null
-
-    if (req.body.banner != null && req.body.banner !== '') {
-        oldBanner = oldPost.banner
-        oldEncoding = oldPost.bannerEncoding
-        banner = saveBanner(oldPost, req.body.banner)
-    }
 
     // Invalid post types.
     if(description == '' && markdown != ''){
         res.render(`posts/edit`, {
-            post: oldPost,
+            post: post,
             errorMessage: 'You need to provide a description if you post text.'
         })
     }
     else if(description == '' && markdown == '' && banner == null) {
         res.render(`posts/edit`, {
-            post: oldPost,
+            post: post,
             errorMessage: 'You need to post an image if you dont have a description/text.'
         })
     }
-    else if(banner?.size > 2097152) {
-        oldPost.banner = oldBanner
-        oldPost.bannerEncoding = oldEncoding
+    else if(banner?.size > 10485760) {
         res.render(`posts/edit`, {
-            post: oldPost,
-            errorMessage: 'The image is too big (max. 2MB).'
+            post: post,
+            errorMessage: 'The image is too big (max. 10MB).'
         })
     }
     else
         try {
-            oldPost.title = title
-            oldPost.description = description
-            oldPost.markdown = markdown
-            oldPost.tags = tags
-            await oldPost.save()
-            res.redirect(`/posts/${id}`)
+            post.title = title
+            post.description = description
+            post.markdown = markdown
+            post.tags = tags
+            if (banner != null) {
+                let imgurPost
+                fetch("https://api.imgur.com/3/image", {
+                    method: "POST",
+                    headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "Authorization": "Client-ID " + process.env.IMGUR_ID
+                        },
+                    body: `type=base64&image=${encodeURIComponent(banner.data)}`
+                    }).then((resp) => resp.json()).then(async (data) => {
+                        post.banner = data.data.link
+                        post.deleteHash = data.data.deletehash
+                        const newPost = await post.save()
+                        res.redirect(`${id}`)
+                        return
+                    }).catch((err) => {
+                        console.error(err)
+                })
+            }
+            else {
+                const newPost = await post.save()
+                res.redirect(`${id}`)
+                return
+            }
         } catch {
             res.render(`posts/edit`, {
-                post: oldPost,
+                post: post,
                 errorMessage: 'Error creating post.'
             })
         }
@@ -230,10 +267,26 @@ router.put('/:id', onlyAuth, async (req, res) => {
 router.delete('/:id', onlyAuth, async (req, res) => {
     try {
         post = await Post.findById(req.params.id)
-        if (req.session?.passport?.user != post.author) {
+        if (req.session?.passport?.user != post.author && process.env.ADMIN_ID != req.session?.passport?.user) {
             res.redirect('/posts')
+            return
+        }
+        if (post.deleteHash != null) {
+            fetch("https://api.imgur.com/3/image/" + post.deleteHash, {
+                    method: "DELETE",
+                    headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "Authorization": "Client-ID " + process.env.IMGUR_ID
+                        }
+                    }).then((resp) => resp.json()).then((data) => {
+
+                    }).catch((err) => {
+                        console.error(err)
+            })
         }
         await post.remove()
+        res.redirect('/posts')
+        return
     }
     catch {
     }

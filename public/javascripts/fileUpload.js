@@ -7,7 +7,7 @@ FilePond.registerPlugin(
 FilePond.setOptions({
     dropOnPage: true,
     dropOnElement: false,
-    imageResizeTargetWidth: 500,
+    imageResizeTargetWidth: 600,
 })
 
 FilePond.parse(document.body);

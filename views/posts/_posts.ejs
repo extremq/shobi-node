@@ -2,8 +2,8 @@
 <% posts.forEach(post => { %>
     <% i = i + 1 %>
     <div class="card mb-3" style="max-width: 600px; margin:auto">
-        <% if (post.banner && post.bannerEncoding) { %>
-        <img src="<%= `data:${post.bannerEncoding};charset=utf-8;base64,${post.banner.toString('base64')}` %>" style="max-width: 600px;">
+        <% if (post.banner?.length > 5) { %>
+        <img src="<%= post.banner %>" style="max-width: 600px;">
         <% } %>
         <div class="card-body">
             <h5 class="card-title"><%= post.title %></h5>
@@ -18,7 +18,7 @@
                 <div class="col-12">
                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="showToast();copyToClipboard('<%= post.id %>')" id="<%= post.id %>">Copy <i class="fa fa-link fa-sm"></i></button>
                 </div>
-                <% if (post.authorName == user?.name) { %>
+                <% if (post.authorName == user?.name || user?.name == admin) { %>
                     <div class="col-12">
                         <a class="btn btn-sm btn-outline-success" href="posts/<%= post.id %>/edit">Edit <i class="far fa-sm fa-edit"></i></a>
                     </div>

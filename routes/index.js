@@ -8,7 +8,9 @@ const app = require('../app')
 
 const { now } = require('mongoose')
 const User = require('../models/user')
+const AuthKey = require('../models/authKey')
 
+const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const passport = require('passport')
 const flash = require('express-flash')
@@ -57,17 +59,46 @@ router.get('/register', onlyNotAuth, (req, res) => {
     res.render('register.ejs')
 })
 
+router.get('/authkey', onlyAuth, async (req, res) => {
+    // Comment the if/else clause in order to generate the first key
+    if (req.session.passport.user != process.env.ADMIN_ID) {
+        res.redirect('/')
+    }
+    else {
+        key = new AuthKey({
+            key: crypto.randomBytes(20).toString('hex')
+        })
+        await key.save()
+        res.render('authkey.ejs', {
+            key: key.key
+        })
+    }
+})
+
 router.post('/register', onlyNotAuth, async (req, res) => {
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10)
-        var user = new User({
-            createdAt: Date.now().toString(),
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPassword
-        });
-        await user.save()
-        res.redirect('/login')
+        key = await AuthKey.findOne({ key: req.body.key })
+        if (key == null) {
+            res.redirect('/register')
+            return
+        }
+        else {
+            var check = await User.findOne({ name: req.body.name })
+            if (check){
+                res.redirect('/register')
+            }
+            const hashedPassword = await bcrypt.hash(req.body.password, 10)
+            var user = new User({
+                createdAt: Date.now().toString(),
+                name: req.body.name,
+                email: req.body.email,
+                password: hashedPassword
+            });
+            await user.save()
+            // console.log(user.id) // uncomment this for setting ADMIN_ID
+            await key.remove()
+            res.redirect('/login')
+        }
     } catch (error) {
         res.redirect('/register')
     }
@@ -99,6 +130,7 @@ function onlyNotAuth(req, res, next) {
 app.use(async (req, res, next) => {
     user = await getUserById(req.session?.passport?.user)
     res.locals.user = user
+    admin = process.env.ADMIN_NAME
     next();
 });
 module.exports = router

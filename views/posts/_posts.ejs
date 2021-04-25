@@ -10,11 +10,9 @@
             <h6 class="card-subtitle text-muted mb-2">by @<%= post.authorName %> on <%= post.createdAt.split('T')[0] %>.</h6>
             <p class="card-text"><%= post.description %></p>
             <form class="d-flex justify-content-left card-text" method="post" action="posts/<%= post.id %>?_method=DELETE">
-                <% if (post.markdown) { %>
                 <div class="d-inline m-1">
-                    <a class="btn btn-sm btn-outline-primary shadow-sm" href="posts/<%= post.id %>">Read the post <i class="far fa-sm fa-file-alt"></i></a>
+                    <a class="btn btn-sm btn-outline-primary shadow-sm" href="posts/<%= post.id %>">View the post <i class="far fa-sm fa-file-alt"></i></a>
                 </div>
-                <% } %>
                 <div class="d-inline m-1">
                     <button type="button" class="btn btn-sm btn-outline-secondary shadow-sm" onclick="showToast();copyToClipboard('<%= post.id %>')" id="<%= post.id %>">Copy <i class="fa fa-link fa-sm"></i></button>
                 </div>
@@ -27,6 +25,7 @@
                     </div>
                 <% } %>
             </form>
+            <small>Comment count: <%= post.comments.arr.length %>.</small>
         </div>
         <% if (post.tags.length > 0) { %>
         <div class="card-footer">

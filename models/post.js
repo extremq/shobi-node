@@ -43,8 +43,12 @@ const postSchema = new mongoose.Schema({
         required: true 
     },
     comments: {
-        type: Array,
-        required: true
+        type: Object,
+        required: true,
+        default: {
+            arr: [],
+            id: 0
+        }
     }
 })
 

@@ -23,8 +23,54 @@
             </form>
             <% if (post.markdown) { %>
             <%- post.markdown %>
-            <% } %> 
+            <% } %>             
         </div>
+        
+        <% if (post.tags.length > 0) { %>
+            <div class="card-footer">
+                <i class="fa fa-sm fa-hashtag"></i> Tags: 
+                <% post.tags.forEach(tag => { %>
+                    <a href="posts?tags=<%= tag %>"><%= tag %></a>
+                <% }); %>
+            </div>
+        <% } %>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><i class="fa fa-sm fa-comments"></i> 
+                <% if(post.comments.arr.length == 0) {%>
+                    Nobody has commented yet!
+                <% }else{%>
+                    Comments (<%= post.comments.arr.length %>)
+                <% }%> 
+                <br>
+                <% if(user?.name) {%>
+                    <form action="/posts/<%= post.id %>/comment" method="POST">
+                        <label class="form-label" for="comment">Add a comment as @<strong><%= user.name %></strong></label>
+                        <textarea class="mb-2 form-control form-sm" name="comment" rows="2" maxlength="256" minlength="2"></textarea>
+                        <button type="submit" class="btn btn-outline-success btn-sm">Submit</button>
+                    </form>
+                    
+                <% } else { %>
+                    <div class="px-3 py-1 mb-1 text-muted">
+                        <a href="/register">Make an account</a> or <a href="/login">Login</a> to post a comment.
+                    </div>
+                <% }%>
+            </li>
+            <% post.comments.arr.forEach(comment => {%>
+                <li class="list-group-item mb-1">
+                    <i class="fa fa-sm fa-comment"></i> Comment by @<strong><%= comment.author %></strong> on <%= comment.createdAt.split('T')[0] %> at <%= comment.createdAt.split('T')[1].split('.')[0] %> <br>
+                    
+                    <div class="px-3 py-1 text-muted">
+                        <%= comment.text %>
+                        
+                    </div>
+                    <% if(comment.author == user?.name || user?.name == admin) {%>
+                    <form class="text-end" action="/posts/<%= post.id %>/comment/<%= comment.id %>?_method=DELETE" method="POST">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete <i class="far fa-sm fa-trash-alt"></i></button>
+                    </form>
+                    <% } %>
+                </li>
+            <%})%>
+        </ul>
     </div>
 </div>
 <div class="position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 5">

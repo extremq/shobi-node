@@ -50,6 +50,52 @@ router.get('/tags', async (req, res) => {
     })
 })
 
+router.delete('/:id/comment/:index', onlyAuth, async (req, res) => {
+    var post = await Post.findById(req.params.id)
+    if (post?.id != req.params.id) {
+        res.redirect('/posts/' + req.params.id)
+        return
+    }
+    if (req.params.index >= 0) {
+        requester = await getUserById(req.session?.passport?.user)
+        comment_index = post.comments.arr.findIndex((item) => {
+            return item.id == req.params.index
+        })
+        comment = post.comments.arr[comment_index]
+        author = comment.author
+        if (author != requester.name && process.env.ADMIN_ID != req.session?.passport?.user) {
+            res.redirect('/posts/' + req.params.id)
+            return
+        }
+        post.comments.arr.splice(comment_index, 1)
+        post.markModified('comments')
+        await post.save()
+    }
+    res.redirect('/posts/' + req.params.id)
+})
+
+router.post('/:id/comment', onlyAuth, async (req, res) => {
+    var post = await Post.findById(req.params.id)
+    if (post?.id != req.params.id) {
+        res.redirect('/posts/' + req.params.id)
+        return
+    }
+    comment = req.body.comment.trim().substring(0, 255)
+    if (comment.length > 1) {
+        creator = await getUserById(req.session?.passport?.user)
+        post.comments.id += 1 
+        post.comments.arr.push({
+            id: post.comments.id,
+            text: comment,
+            createdAt: new Date().toISOString(),
+            author: creator.name
+        })
+        post.markModified('comments')
+        await post.save()
+    }
+    res.redirect('/posts/' + req.params.id)
+})
+
 router.get('/page/:page', async (req, res) => {
     itemsPerPage = 5
     page = parseInt(req.params.page)
@@ -62,9 +108,9 @@ router.get('/page/:page', async (req, res) => {
         title = req.query.title.trim()
         searchOptions.title = { $regex: title, $options: 'i'}
     }
-    if (req.query.description && req.query.description.trim() != '') {
-        description = req.query.description.trim()
-        searchOptions.description = { $regex: description, $options: 'i'}
+    if (req.query.author && req.query.author.trim() != '') {
+        author = req.query.author.trim()
+        searchOptions.authorName = { $regex: author, $options: 'i'}
     }
     if (req.query.markdown && req.query.markdown.trim() != '') {
         markdown = req.query.markdown.trim()
@@ -126,7 +172,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', onlyAuth, async (req, res) => {
     let banner
     try {
-        if (banner?.length > 10)
+        if (req.body.banner?.length > 10)
         banner = JSON.parse(req.body.banner)
     }
     catch (e){
@@ -143,7 +189,10 @@ router.post('/', onlyAuth, async (req, res) => {
         author: creator,
         authorName: creator.name,
         likers: [],
-        comments: []
+        comments: {
+            id: 0,
+            arr: []
+        }
     })
     post.tags = [...new Set(post.tags)];
 
@@ -168,7 +217,7 @@ router.post('/', onlyAuth, async (req, res) => {
     }
     else
         try {
-            if (banner != null) {
+            if (banner) {
                 let imgurPost
                 fetch("https://api.imgur.com/3/image", {
                     method: "POST",
@@ -205,7 +254,7 @@ router.post('/', onlyAuth, async (req, res) => {
 router.put('/:id', onlyAuth, async (req, res) => {
     let banner
     try {
-        if (banner?.length > 10)
+        if (req.body.banner?.length > 10)
         banner = JSON.parse(req.body.banner)
     }
     catch (e){
@@ -257,8 +306,7 @@ router.put('/:id', onlyAuth, async (req, res) => {
             post.description = description
             post.markdown = markdown
             post.tags = tags
-            if (banner != null) {
-                let imgurPost
+            if (banner) {
                 fetch("https://api.imgur.com/3/image", {
                     method: "POST",
                     headers: {
@@ -269,7 +317,7 @@ router.put('/:id', onlyAuth, async (req, res) => {
                     }).then((resp) => resp.json()).then(async (data) => {
                         post.banner = data.data.link
                         post.deleteHash = data.data.deletehash
-                        const newPost = await post.save()
+                        await post.save()
                         res.redirect(`${id}`)
                         return
                     }).catch((err) => {
@@ -277,7 +325,7 @@ router.put('/:id', onlyAuth, async (req, res) => {
                 })
             }
             else {
-                const newPost = await post.save()
+                await post.save()
                 res.redirect(`${id}`)
                 return
             }

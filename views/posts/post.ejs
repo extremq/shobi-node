@@ -6,7 +6,7 @@
         <div class="card-body">
             <h3 class="card-title display-6" style="text-align: center;"><%= post.title %></h3>
             <p class="card-subtitle text-muted"style="text-align: center;"><%= post.description %></p>
-            <p class="card-subtitle text-muted mb-3" style="text-align: center;"><small>Created by @<%= post.authorName %> on <%= post.createdAt.split('T')[0] %>.</small></p>
+            <p class="card-subtitle text-muted mb-3" style="text-align: center;"><small>Created by @<strong><%= post.authorName %></strong> on <%= post.createdAt.split('T')[0]%> at <%= post.createdAt.split('T')[1].split('.')[0] %>.</small></p>
             
             <form class="d-flex justify-content-center" method="post" action="<%= post.id %>?_method=DELETE">
                 <div class="d-inline m-1">

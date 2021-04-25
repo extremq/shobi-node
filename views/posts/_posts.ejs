@@ -7,7 +7,7 @@
         <% } %>
         <div class="card-body">
             <h5 class="card-title"><%= post.title %></h5>
-            <h6 class="card-subtitle text-muted mb-2">by @<%= post.authorName %> on <%= post.createdAt.split('T')[0] %>.</h6>
+            <p class="card-subtitle text-muted mb-2"><small>by @<strong><%= post.authorName %></strong> on <%= post.createdAt.split('T')[0] %> at <%= post.createdAt.split('T')[1].split('.')[0] %>.</small></p>
             <p class="card-text"><%= post.description %></p>
             <form class="d-flex justify-content-left card-text" method="post" action="posts/<%= post.id %>?_method=DELETE">
                 <div class="d-inline m-1">

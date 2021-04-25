@@ -1,7 +1,7 @@
 <% let i = 0 %>
 <% posts.forEach(post => { %>
     <% i = i + 1 %>
-    <div class="card mb-3 shadow" style="max-width: 600px; margin:auto">
+    <div class="card mb-3 shadow-sm" style="max-width: 600px; margin:auto">
         <% if (post.banner?.length > 5) { %>
         <img src="<%= post.banner %>" style="max-width: 600px;">
         <% } %>

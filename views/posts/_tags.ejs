@@ -1,9 +1,14 @@
 <div class="card-body">
+    <% if(count > 0) { %> 
     <h5 class="card-title"><i class="fa fa fa-hashtag"></i> Tagged posts: <strong><%= count %></strong></h5>
+    <p class="card-subtitle text-muted"><small>Showing top 10 most used tags</small></p>
     <ul>
     <% let i = 0 %>
     <% for(const tag in tags) { %>
         <li><a href="/posts?tags=<%= tag %>"><%= tag %></a> (<%= tags[tag] %>)</li>
     <% } %>
     </ul>
+    <% } else { %>
+        No tags to show yet!    
+    <% } %>
 </div>

@@ -41,7 +41,7 @@ router.get('/tags', async (req, res) => {
         });
     });
     siteTags = Object.fromEntries(
-        Object.entries(siteTags).sort(([,a],[,b]) => b-a)
+        Object.entries(siteTags).sort(([,a],[,b]) => b-a).slice(0, 10)
     );
     res.render('posts/_tags', {
         layout: false,

@@ -5,7 +5,7 @@
     <ul>
     <% let i = 0 %>
     <% for(const tag in tags) { %>
-        <li><a href="/posts?tags=<%= tag %>"><%= tag %></a> (<%= tags[tag] %>)</li>
+        <li><a class="text-decoration-none" href="/posts?tags=<%= tag %>"><%= tag %></a> (<%= tags[tag] %>)</li>
     <% } %>
     </ul>
     <% } else { %>

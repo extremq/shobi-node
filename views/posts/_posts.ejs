@@ -4,7 +4,7 @@
     <div class="card mb-3 shadow-sm" style="max-width: 600px; margin:auto">
         <% if(post.lastAction && post.lastAction.type != null) { %>
         <div class="card-header">
-            <small><a class="text-decoration-none" href="">@<%= post.lastAction.author %></a> <%= post.lastAction.type %> this post! <span class="text-muted"> - <%= post.lastActionDate.split('T')[0] %> at <%= post.lastActionDate.split('T')[1]?.split('.')[0] %>. </span></small> 
+            <small><a class="text-decoration-none" href="/u/<%= post.lastAction.author %>">@<%= post.lastAction.author %></a> <%= post.lastAction.type %> this post! <span class="text-muted"> - <%= post.lastActionDate.split('T')[0] %> at <%= post.lastActionDate.split('T')[1]?.split('.')[0] %>. </span></small> 
         </div>
         <% } %>
         <% if (post.banner?.length > 5) { %>
@@ -12,7 +12,7 @@
         <% } %>
         <div class="card-body">
             <h5 class="card-title"><%= post.title %></h5>
-            <p class="card-subtitle text-muted mb-2"><small><a class="text-decoration-none" href="#">@<%= post.authorName %></a> on <%= post.createdAt.split('T')[0] %> at <%= post.createdAt.split('T')[1].split('.')[0] %>.</small></p>
+            <p class="card-subtitle text-muted mb-2"><small><a class="text-decoration-none" href="/u/<%= post.authorName %>">@<%= post.authorName %></a> on <%= post.createdAt.split('T')[0] %> at <%= post.createdAt.split('T')[1].split('.')[0] %>.</small></p>
             <p class="card-text"><%= post.description %></p>
             <form class="d-flex justify-content-left card-text" method="post" action="posts/<%= post.id %>?_method=DELETE">
                 <div class="d-inline m-1">

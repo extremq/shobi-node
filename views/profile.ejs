@@ -1,0 +1,100 @@
+
+<div class="container" id="page" style="max-width: 1145px;">    
+    </div>  
+    <div class="m-auto">
+        <div class="card mb-3 shadow-sm" style="max-width: 600px; margin:auto">
+            <div class="card-body">
+                <h3 class="display-6"><%= user.name %>'s posts</h3>
+                <span id="name" class="d-none"><%= user.name %></span>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- content to be added here -->
+        </div>
+    </div>
+    
+    <div id="spinner" class="mb-3" style="text-align: center;">
+        <i class="fas fa-fan fa-2x fa-spin"></i>
+    </div>
+
+    <div class="position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 5">
+        <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Link copied to clipboard.
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+var page = 1
+var lastRequest = Date.now() - 1 * 1000
+var reachedEnd = false
+var ongoingFeedRequest = false
+
+var mainLoopId = setInterval(function(){
+    updatePosts()
+}, 1000);
+
+$(window).scroll(function(){
+    updatePosts()
+});
+
+function updatePosts(){
+    var pageBottom = $('#page').position().top + $('#page')[0].scrollHeight;
+    var screenBottom = $(window).scrollTop() + window.screen.height;
+    var who = $('#name')[0].innerHTML
+    if(
+        !ongoingFeedRequest &&
+        !reachedEnd &&
+        screenBottom >= pageBottom &&
+        Date.now() - lastRequest > 1 * 1000
+    ) {
+        ongoingFeedRequest = true
+        lastRequest = Date.now()
+        $.ajax({
+            method: "get",
+            url: "/posts/page/" + page + "?author=" + who,
+            success: function(response, textStatus, jqXHR){
+                ongoingFeedRequest = false
+                page = page + 1
+
+                var postsCount = parseInt(jqXHR.getResponseHeader("x-post-count"))
+
+                if (postsCount == 0) {
+                    reachedEnd = true
+                    $('#spinner').remove()
+                }
+                else if (postsCount == -1) {
+                    // Internal server error.
+                    // Give a little grace period (3s total) to cool things down!
+                    lastRequest = Date.now() + 2 * 1000
+                }
+                else {
+                    $('.main-content').append(response)
+                }
+            }
+        });
+    }
+}
+
+function copyToClipboard(id) {
+    var dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    var copyText = "https://" + window.location.hostname + "/posts/" + id
+    dummy.value = copyText;
+    dummy.select();
+    dummy.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+}
+var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+var toastList = toastElList.map(function (toastEl) {
+  return new bootstrap.Toast(toastEl)
+})
+function showToast(){
+    toastList[0].show()
+}
+</script>

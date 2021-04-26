@@ -6,7 +6,7 @@
         <div class="card-body">
             <h3 class="card-title display-6" style="text-align: center;"><%= post.title %></h3>
             <p class="card-subtitle text-muted"style="text-align: center;"><%= post.description %></p>
-            <p class="card-subtitle text-muted mb-3" style="text-align: center;"><small>Created by <a class="text-decoration-none" href="#">@<%= post.authorName %></a> on <%= post.createdAt.split('T')[0]%> at <%= post.createdAt.split('T')[1].split('.')[0] %>.</small></p>
+            <p class="card-subtitle text-muted mb-3" style="text-align: center;"><small>Created by <a class="text-decoration-none" href="/u/<%=post.authorName%>">@<%= post.authorName %></a> on <%= post.createdAt.split('T')[0]%> at <%= post.createdAt.split('T')[1].split('.')[0] %>.</small></p>
             
             <form class="d-flex justify-content-center" method="post" action="<%= post.id %>?_method=DELETE">
                 <% if (user?.name) {%>
@@ -70,7 +70,7 @@
             </li>
             <% post.comments.arr.forEach(comment => {%>
                 <li class="list-group-item mb-1">
-                    <i class="fa fa-sm fa-comment"></i><span class=" text-muted"> <a class="text-decoration-none" href="#">@<%= comment.author %></a> on <%= comment.createdAt.split('T')[0] %> at <%= comment.createdAt.split('T')[1].split('.')[0] %></span> <br>
+                    <i class="fa fa-sm fa-comment"></i><span class=" text-muted"> <a class="text-decoration-none" href="/u/<%= comment.author %>">@<%= comment.author %></a> on <%= comment.createdAt.split('T')[0] %> at <%= comment.createdAt.split('T')[1].split('.')[0] %></span> <br>
                     
                     <div class="px-3 py-1">
                         <%= comment.text %>

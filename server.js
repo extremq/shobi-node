@@ -11,6 +11,7 @@ const methodOverride = require('method-override')
 
 const indexRouter = require('./routes/index')
 const postRouter = require('./routes/posts')
+const userRouter = require('./routes/users')
 
 // Sets
 app.set('view engine', 'ejs')
@@ -33,6 +34,7 @@ db.once('open', () => console.log('Connected to mongoose.'))
 // Routes
 app.use('/', indexRouter)
 app.use('/posts', postRouter)
+app.use('/u', userRouter)
 
 app.listen(process.env.PORT || 3000)
 

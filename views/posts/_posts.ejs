@@ -2,6 +2,11 @@
 <% posts.forEach(post => { %>
     <% i = i + 1 %>
     <div class="card mb-3 shadow-sm" style="max-width: 600px; margin:auto">
+        <% if(post.lastAction && post.lastAction.type != null) { %>
+        <div class="card-header">
+            <small><a class="text-decoration-none" href="">@<%= post.lastAction.author %></a> <%= post.lastAction.type %> this post! <span class="text-muted"> - <%= post.lastActionDate.split('T')[0] %> at <%= post.lastActionDate.split('T')[1]?.split('.')[0] %>. </span></small> 
+        </div>
+        <% } %>
         <% if (post.banner?.length > 5) { %>
         <img src="<%= post.banner %>" style="max-width: 600px;">
         <% } %>
@@ -25,7 +30,7 @@
                     </div>
                 <% } %>
             </form>
-            <small>Comment count: <%= post.comments.arr.length %>.</small>
+            <small><%= post.likers.length %> <abbr class="text-decoration-none" title="<%= post.likers.join(', ') %>">Like<%if(post.likers.length != 1){%>s<%}%></abbr>, <%= post.comments.arr.length %> Comment<%if(post.comments.arr.length != 1){%>s<%}%>.</small>
         </div>
         <% if (post.tags.length > 0) { %>
         <div class="card-footer">

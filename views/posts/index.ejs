@@ -31,6 +31,14 @@
                                     <label class="form-label">By tag</label>
                                     <input class="form-control form-control-sm shadow-sm" type="text" name="tags" pattern="[a-z0-9_- ]+" value="">
                                 </div>
+                                <div class="col-md-6">
+                                    <input class="form-check-input shadow-sm" type="checkbox" name="creation" value="on">
+                                    <label class="form-check-label">By creation date</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-check-input shadow-sm" type="checkbox" name="oldest" value="on">
+                                    <label class="form-check-label">Oldest first</label>
+                                </div>
                                 <div class="col-12">
                                     <button class="btn btn-outline-success btn-sm shadow-sm" type="submit">Search <i class="fa fa-sm fa-search"></i></button>
                                     <a class="btn btn-outline-danger btn-sm shadow-sm" href="/posts">Clear filter <i class="far fa-sm fa-trash-alt"></i></a>

@@ -8,6 +8,7 @@ const app = require('../app')
 
 const { now } = require('mongoose')
 const User = require('../models/user')
+const Post = require('../models/post')
 const AuthKey = require('../models/authKey')
 
 const crypto = require('crypto')
@@ -72,6 +73,26 @@ router.get('/authkey', onlyAuth, async (req, res) => {
         res.render('authkey.ejs', {
             key: key.key
         })
+    }
+})
+
+router.get('/update', onlyAuth, async (req, res) => {
+    // Comment the if/else clause in order to generate the first key
+    if (req.session.passport.user != process.env.ADMIN_ID) {
+        res.redirect('/')
+    }
+    else {
+        posts = await Post.find({})
+        posts.forEach(async (post) =>{
+            await Post.updateOne({_id:post._id}, [
+                {$set: {lastActionDate: post.createdAt}}, 
+                {$set: {lastAction: {
+                    type: null,
+                    author: post.authorName
+                }}},
+            ])
+        })
+        res.redirect('/')
     }
 })
 

@@ -9,6 +9,17 @@
             <p class="card-subtitle text-muted mb-3" style="text-align: center;"><small>Created by <a class="text-decoration-none" href="#">@<%= post.authorName %></a> on <%= post.createdAt.split('T')[0]%> at <%= post.createdAt.split('T')[1].split('.')[0] %>.</small></p>
             
             <form class="d-flex justify-content-center" method="post" action="<%= post.id %>?_method=DELETE">
+                <% if (user?.name) {%>
+                <div class="d-inline m-1">
+                    <a class="btn btn-sm btn-outline-danger shadow-sm <% if (post.likers.indexOf(user.name) != -1) { %>disabled<% } %>" href="<%= post.id %>/like">
+                        <% if (post.likers.indexOf(user.name) != -1) { %>
+                            Liked! <i class="fa fa-heart fa-sm"></i>
+                        <% } else {%>
+                            Like <i class="far fa-heart fa-sm"></i>
+                        <% }%> 
+                    </a>
+                </div>
+                <% } %>
                 <div class="d-inline m-1">
                     <button type="button" class="btn btn-sm btn-outline-secondary shadow-sm" onclick="showToast();copyToClipboard('<%= post.id %>')" id="<%= post.id %>">Copy <i class="fa fa-link fa-sm"></i></button>
                 </div>
@@ -26,24 +37,23 @@
             <% } %>             
         </div>
         
-        <% if (post.tags.length > 0) { %>
-            <div class="card-footer">
-                <i class="fa fa-sm fa-hashtag"></i> Tags: 
+        <div class="card-footer">
+            <% if (post.tags.length > 0) { %>
+            <i class="fa fa-sm fa-hashtag"></i> Tags: 
                 <% post.tags.forEach(tag => { %>
-                    <a class="text-decoration-none" href="posts?tags=<%= tag %>"><%= tag %></a>
-                <% }); %>
-            </div>
-        <% } %>
+                <a class="text-decoration-none" href="posts?tags=<%= tag %>"><%= tag %></a>
+                <% }); %><br>
+            <% } %>
+            <i class="fa fa-sm fa-heart"></i> <%= post.likers.length %> <abbr class="text-decoration-none" title="<%= post.likers.join(', ') %>">Like<%if(post.likers.length != 1){%>s<%}%></abbr>
+        </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
                 <i class="fa fa-sm fa-comments"></i> 
-                <span class="text-muted">
                 <% if(post.comments.arr.length == 0) {%>
                     Nobody has commented yet!
                 <% }else{%>
-                    Comments (<%= post.comments.arr.length %>)
-                <% }%> 
-                </span>
+                    <%= post.comments.arr.length %> Comment<%if(post.comments.arr.length != 1){%>s<%}%>
+                <% }%>
                 <br>
                 <% if(user?.name) {%>
                     <form action="/posts/<%= post.id %>/comment" method="POST">

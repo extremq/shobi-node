@@ -49,6 +49,18 @@ const postSchema = new mongoose.Schema({
             arr: [],
             id: 0
         }
+    },
+    lastAction: {
+        type: Object,
+        required: true,
+        default: {
+            type: null,
+            author: null
+        }
+    },
+    lastActionDate: {
+        type: String,
+        required: true
     }
 })
 

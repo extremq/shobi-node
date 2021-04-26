@@ -24,6 +24,15 @@ async function getUserById(id) {
     return null
 }
 
+function addAction(post, type, author) {
+    post.lastAction = {
+        type: type,
+        author: author
+    }
+    post.lastActionDate = new Date().toISOString()
+    post.markModified('lastAction')
+}
+
 // All Posts Route
 router.get('/', async(req, res) => {
     res.render('posts/index')
@@ -90,9 +99,27 @@ router.post('/:id/comment', onlyAuth, async (req, res) => {
             createdAt: new Date().toISOString(),
             author: creator.name
         })
+        addAction(post, "commented on", creator.name)
         post.markModified('comments')
         await post.save()
     }
+    res.redirect('/posts/' + req.params.id)
+})
+
+router.get('/:id/like', onlyAuth, async(req, res) => {
+    var post = await Post.findById(req.params.id)
+    if (post?.id != req.params.id) {
+        res.redirect('/posts/' + req.params.id)
+        return
+    }
+    var creator = await getUserById(req.session?.passport?.user)
+    if (post.likers.indexOf(creator) != -1) {
+        res.redirect('/posts/' + req.params.id)
+        return
+    }
+    post.likers.push(creator.name)
+    addAction(post, "liked", creator.name)
+    await post.save()
     res.redirect('/posts/' + req.params.id)
 })
 
@@ -117,9 +144,14 @@ router.get('/page/:page', async (req, res) => {
         searchOptions.markdown = { $regex: markdown, $options: 'i'}
     }
     try {
-        const posts = await Post.find(searchOptions).sort({ createdAt: -1 })
+        criteria = req.query?.creation == "on" ? "createdAt" : "lastActionDate"
+        order = req.query?.oldest == "on" ? 1 : -1
+        sorting = {}
+        sorting[criteria] = order
+        const posts = await Post.find(searchOptions).sort(sorting)
                                                     .skip(itemsPerPage * (page - 1))
                                                     .limit(itemsPerPage)
+
         res.set("x-post-count", posts.length)
         res.render('posts/_posts', {
             layout: false,
@@ -192,7 +224,8 @@ router.post('/', onlyAuth, async (req, res) => {
         comments: {
             id: 0,
             arr: []
-        }
+        },
+        lastActionDate: new Date().toISOString()
     })
     post.tags = [...new Set(post.tags)];
 

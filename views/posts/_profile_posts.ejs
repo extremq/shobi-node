@@ -14,16 +14,16 @@
             <h5 class="card-title"><%= post.title %></h5>
             <p class="card-subtitle text-muted mb-2"><small><a class="text-decoration-none" href="/u/<%= post.authorName %>">@<%= post.authorName %></a> on <%= post.createdAt.split('T')[0] %> at <%= post.createdAt.split('T')[1].split('.')[0] %>.</small></p>
             <p class="card-text"><%= post.description %></p>
-            <form class="d-flex justify-content-left card-text" method="post" action="/posts/<%= post.id %>?_method=DELETE">
+            <form class="d-flex justify-content-left card-text" method="post" action="../posts/<%= post.id %>?_method=DELETE">
                 <div class="d-inline m-1">
-                    <a class="btn btn-sm btn-outline-primary shadow-sm" href="/posts/<%= post.id %>">View the post <i class="far fa-sm fa-file-alt"></i></a>
+                    <a class="btn btn-sm btn-outline-primary shadow-sm" href="../posts/<%= post.id %>">View the post <i class="far fa-sm fa-file-alt"></i></a>
                 </div>
                 <div class="d-inline m-1">
                     <button type="button" class="btn btn-sm btn-outline-secondary shadow-sm" onclick="showToast();copyToClipboard('<%= post.id %>')" id="<%= post.id %>">Copy <i class="fa fa-link fa-sm"></i></button>
                 </div>
                 <% if (post.authorName == user?.name || user?.name == admin) { %>
                     <div class="d-inline m-1">
-                        <a class="btn btn-sm btn-outline-success shadow-sm" href="/posts/<%= post.id %>/edit">Edit <i class="far fa-sm fa-edit"></i></a>
+                        <a class="btn btn-sm btn-outline-success shadow-sm" href="../posts/<%= post.id %>/edit">Edit <i class="far fa-sm fa-edit"></i></a>
                     </div>
                     <div class="d-inline m-1">
                         <button class="btn btn-sm btn-outline-danger shadow-sm" type="submit">Delete <i class="far fa-sm fa-trash-alt"></i></button>
@@ -36,7 +36,7 @@
         <div class="card-footer">
             <i class="fa fa-sm fa-hashtag"></i> Tags: 
             <% post.tags.forEach(tag => { %>
-                <a class="text-decoration-none" href="/posts?tags=<%= tag %>"><%= tag %></a>
+                <a class="text-decoration-none" href="../posts?tags=<%= tag %>"><%= tag %></a>
             <% }); %>
         </div>
         <% } %>

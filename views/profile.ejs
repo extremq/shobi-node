@@ -4,8 +4,25 @@
     <div class="m-auto">
         <div class="card mb-3 shadow-sm" style="max-width: 600px; margin:auto">
             <div class="card-body">
-                <h3 class="display-6"><%= user.name %>'s posts</h3>
-                <span id="name" class="d-none"><%= user.name %></span>
+                <h3 class="display-6"><%= userProfile.name %>'s profile</h3>
+                <span id="name" class="d-none"><%= userProfile.name %></span>
+                <div class="row align-items-start">
+                    <div class="col-12">
+                        <p class="lead">Joined on: <strong><%= new Date(userProfile.createdAt * 1).toISOString().split('T')[0] %></strong></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="lead">Posts created: <strong><%= userProfile.stats.posts%></strong></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="lead">Comments created: <strong><%= userProfile.stats.comments%></strong></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="lead">Likes received: <strong><%= userProfile.stats.likesIncoming%></strong></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="lead">Likes given: <strong><%= userProfile.stats.likesOutcoming%></strong></p>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="main-content">

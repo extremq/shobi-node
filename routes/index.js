@@ -77,15 +77,53 @@ router.get('/authkey', onlyAuth, async (req, res) => {
     }
 })
 
-router.get('/update', onlyAuth, async (req, res) => {
+router.get('/update1', onlyAuth, async (req, res) => {
     // Comment the if/else clause in order to generate the first key
     if (req.session.passport.user != process.env.ADMIN_ID) {
         res.redirect('/')
     }
     else {
+        users = await User.find({})
+        users.forEach(async user => {
+            user.stats = {
+                posts: 0,
+                comments: 0,
+                likesIncoming: 0,
+                likesOutcoming: 0
+            }
+            user.markModified('stats')
+            await user.save()
+        })
+        posts = await Post.find({})
+        posts.forEach(async post => {
+            post.comments.arr.forEach(async comment => {
+                author = await User.findOne({"name": comment.author.toLowerCase()})
+                author.stats.comments += 1
+                author.markModified('stats.comments')
+                console.log(author)    
+                await author.save()
+            })
+            
+            post.likers.forEach(async liker => {
+                author = await User.findOne({"name": liker.toLowerCase()})
+                author.stats.likesOutcoming += 1
+                author.markModified('stats.likesOutcoming')
+                await author.save()
+            })
+        });
+
+        posts.forEach(async post => {
+            creator = await User.findById(post.author)
+            creator.stats.posts +=1
+            creator.stats.likesIncoming += post.likers.length
+            creator.markModified('stats.posts')
+            creator.markModified('stats.likesIncoming')
+            await creator.save()
+        })
         res.redirect('/')
     }
 })
+
 
 router.post('/register', onlyNotAuth, async (req, res) => {
     try {
@@ -95,14 +133,14 @@ router.post('/register', onlyNotAuth, async (req, res) => {
             return
         }
         else {
-            var check = await User.findOne({ name: req.body.name.lower() })
+            var check = await User.findOne({ name: req.body.name.toLowerCase() })
             if (check){
                 res.redirect('/register')
             }
             const hashedPassword = await bcrypt.hash(req.body.password, 10)
             var user = new User({
                 createdAt: Date.now().toString(),
-                name: req.body.name.trim().lower(),
+                name: req.body.name.trim().toLowerCase(),
                 email: req.body.email.trim(),
                 password: hashedPassword
             });

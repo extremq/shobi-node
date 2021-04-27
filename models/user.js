@@ -19,7 +19,13 @@ const userSchema = new mongoose.Schema({
     },
     stats: {
         type: Object,
-        required: true
+        required: true,
+        default: {
+            posts: 0,
+            comments: 0,
+            likesIncoming: 0,
+            likesOutcoming: 0
+        }
     },
     notifications: {
         type: Array,

@@ -7,11 +7,11 @@ const User = require('../models/user')
 const router = express.Router()
 
 router.get('/:name', async (req, res) => {
-    user = await User.findOne({"name": req.params.name}).exec()
-    if (user?.name.lower() != req.params.name.lower()) {
+    userProfile = await User.findOne({"name": req.params.name}).exec()
+    if (userProfile?.name?.toLowerCase() != req.params.name.toLowerCase()) {
         res.redirect('/')
         return
     }
-    res.render('profile.ejs', { user })
+    res.render('profile.ejs', { userProfile })
 })
 module.exports = router

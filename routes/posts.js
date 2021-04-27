@@ -147,6 +147,9 @@ router.post('/:id/comment', onlyAuth, async (req, res) => {
             author: creator.name
         })
         addAction(post, "commented on", creator.name)
+        creator.stats.comments += 1
+        creator.markModified('stats')
+        await creator.save()
         post.markModified('comments')
         await post.save()
     }
@@ -168,6 +171,13 @@ router.get('/:id/like', onlyAuth, async(req, res) => {
     post.likers.push(creator.name)
     addNotification(postCreator, "liked your post", creator, req.params.id)
     addAction(post, "liked", creator.name)
+
+    postCreator.stats.likesIncoming += 1
+    creator.stats.likesOutcoming += 1
+    creator.markModified('stats')
+    postCreator.markModified('stats')
+
+    await creator.save()
     await postCreator.save()
     await post.save()
     res.redirect('/posts/' + req.params.id)
@@ -312,6 +322,9 @@ router.post('/', onlyAuth, async (req, res) => {
                     }).then((resp) => resp.json()).then(async (data) => {
                         post.banner = data.data.link
                         post.deleteHash = data.data.deletehash
+                        creator.stats.posts += 1
+                        creator.markModified('stats')
+                        await creator.save()
                         const newPost = await post.save()
                         res.redirect(`posts/${newPost.id}`)
                         return
@@ -320,6 +333,9 @@ router.post('/', onlyAuth, async (req, res) => {
                 })
             }
             else {
+                creator.stats.posts += 1
+                creator.markModified('stats')
+                await creator.save()
                 const newPost = await post.save()
                 res.redirect(`posts/${newPost.id}`)
                 return
@@ -423,13 +439,13 @@ router.put('/:id', onlyAuth, async (req, res) => {
 // Delete post
 router.delete('/:id', onlyAuth, async (req, res) => {
     try {
-        post = await Post.findById(req.params.id)
-        if (req.session?.passport?.user != post.author && process.env.ADMIN_ID != req.session?.passport?.user) {
+        var postToDelete = await Post.findById(req.params.id)
+        if (req.session?.passport?.user != postToDelete.author && process.env.ADMIN_ID != req.session?.passport?.user) {
             res.redirect('/posts')
             return
         }
-        if (post.deleteHash != null) {
-            fetch("https://api.imgur.com/3/image/" + post.deleteHash, {
+        if (postToDelete.deleteHash != null) {
+            fetch("https://api.imgur.com/3/image/" + postToDelete.deleteHash, {
                     method: "DELETE",
                     headers: {
                             "Content-Type": "application/x-www-form-urlencoded",
@@ -441,11 +457,12 @@ router.delete('/:id', onlyAuth, async (req, res) => {
                         console.error(err)
             })
         }
-        await post.remove()
+        await postToDelete.remove()
         res.redirect('/posts')
         return
     }
-    catch {
+    catch (e){
+        console.log(e)
     }
     res.redirect('/posts')
 })

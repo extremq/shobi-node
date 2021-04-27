@@ -253,7 +253,7 @@ router.get('/:id/edit', onlyAuth, async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const post = await Post.findById(req.params.id)
-        post.markdown = dompurify.sanitize(md(post.markdown))
+        post.markdown = post.markdown
         res.render('posts/post', { post })
     } catch {
         res.redirect('../posts')

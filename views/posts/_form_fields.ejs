@@ -25,6 +25,21 @@
     <input class="filepond shadow-sm" type="file" name="banner">
 </div>
 <script>
+    document.getElementById('markdown').addEventListener('keydown', function(e) {
+    if (e.key == 'Tab') {
+        e.preventDefault();
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+
+        // set textarea value to: text before caret + tab + text after caret
+        this.value = this.value.substring(0, start) +
+        "\t" + this.value.substring(end);
+
+        // put caret at right position again
+        this.selectionStart =
+        this.selectionEnd = start + 1;
+    }
+    });
     function showPreview() {
         document.getElementById('preview').innerHTML = DOMPurify.sanitize(marked(document.getElementById("markdown").value))
     }

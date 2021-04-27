@@ -82,16 +82,6 @@ router.get('/update', onlyAuth, async (req, res) => {
         res.redirect('/')
     }
     else {
-        users = await User.find({})
-        users.forEach(async user => {
-            user.stats = {}
-            user.notifications = [{
-                    type: "has just created notifications",
-                    author: "extremq",
-                    post: "60872ffff21428001518a028"
-                }]
-            await user.save()
-        });
         res.redirect('/')
     }
 })

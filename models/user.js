@@ -23,7 +23,12 @@ const userSchema = new mongoose.Schema({
     },
     notifications: {
         type: Array,
-        required: true
+        required: true,
+        default: [{
+            type: "welcomes you",
+            author: "extremq",
+            post: "60834d142ba764001559f658"
+        }]
     }
 })
 

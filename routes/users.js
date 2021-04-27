@@ -12,8 +12,6 @@ router.get('/:name', async (req, res) => {
         res.redirect('/')
         return
     }
-    res.render('profile.ejs', {
-        user: user
-    })
+    res.render('profile.ejs', { user })
 })
 module.exports = router

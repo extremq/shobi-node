@@ -27,10 +27,7 @@ async function getUserById(id) {
 }
 
 function addAction(post, type, author) {
-    post.lastAction = {
-        type: type,
-        author: author
-    }
+    post.lastAction = { type, author }
     post.lastActionDate = new Date().toISOString()
     post.markModified('lastAction')
 }

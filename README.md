@@ -13,6 +13,7 @@ You also need to create an `.env` file inside the project folder with the follow
     ADMIN_ID={your admin userid}
     ADMIN_NAME={your admin name}
     IMGUR_ID={your imgur client id}
+    PRODUCTION={false if you use http, true if you use https}
 You need to [create an Imgur account](https://imgur.com/register) and [register an application](https://api.imgur.com/#registerapp) for the `IMGUR_ID`
 I suggest modifying the `router.get('/authkey')` route found in `routes/index.js` so you can generate an authkey. After creating an account with it (check `router.post('/register')` first), change it back and set `ADMIN_ID` to be the new account's id.
 Now, you only need to run `npm run devStart` to fire up a server on `localhost:3000`. 

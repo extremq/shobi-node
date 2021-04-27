@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.get('/:name', async (req, res) => {
     user = await User.findOne({"name": req.params.name}).exec()
-    if (user?.name != req.params.name) {
+    if (user?.name.lower() != req.params.name.lower()) {
         res.redirect('/')
         return
     }

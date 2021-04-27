@@ -797,7 +797,7 @@
                 return "<del>" + e + "</del>"
             }, u.link = function(e, u, t) {
                 if (null === (e = V(this.options.sanitize, this.options.baseUrl, e))) return t;
-                e = '<a href="' + H(e) + '"';
+                e = '<a target="_blank" href="' + H(e) + '"';
                 return u && (e += ' title="' + u + '"'), e += ">" + t + "</a>"
             }, u.image = function(e, u, t) {
                 if (null === (e = V(this.options.sanitize, this.options.baseUrl, e))) return t;

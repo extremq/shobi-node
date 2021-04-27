@@ -16,6 +16,14 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    stats: {
+        type: Object,
+        required: true
+    },
+    notifications: {
+        type: Array,
+        required: true
     }
 })
 

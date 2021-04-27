@@ -15,8 +15,8 @@
             <form action="" method="post">
             <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label">Username</label>
-                        <input name="name" type="text" class="form-control form-control-sm shadow-sm" maxlength="16" placeholder="Enter your username">
+                        <label class="form-label">Username (lowercase)</label>
+                        <input name="name" type="text" class="form-control form-control-sm shadow-sm" pattern="^[a-z\-_0-9]{3,16}$" maxlength="16" placeholder="Enter your username">
                     </div>
                     <div class="col-12">
                         <label class="form-label">Password</label>

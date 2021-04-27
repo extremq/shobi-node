@@ -49,9 +49,14 @@
                 </div>
             </div>
         </form>
+        
         <div class="main-content">
             <!-- content to be added here -->
         </div>
+        <% if(user?.name) { %>
+        <div id="notifications" class="shadow-sm position-fixed card d-none d-xl-block align-self-end mx-3" style="width: 230px; top: 96px; left: calc(50% + 300px)">
+        </div>
+        <% } %>
     </div>
     
 
@@ -86,6 +91,14 @@ $.ajax({
     url: "/posts/tags",
     success: function(response, textStatus){
         $('#tags').append(response)
+    }
+});
+
+$.ajax({
+    method: "get",
+    url: "/posts/notifications",
+    success: function(response, textStatus){
+        $('#notifications').append(response)
     }
 });
 

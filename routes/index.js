@@ -82,16 +82,16 @@ router.get('/update', onlyAuth, async (req, res) => {
         res.redirect('/')
     }
     else {
-        posts = await Post.find({})
-        posts.forEach(async (post) =>{
-            await Post.updateOne({_id:post._id}, [
-                {$set: {lastActionDate: post.createdAt}}, 
-                {$set: {lastAction: {
-                    type: null,
-                    author: post.authorName
-                }}},
-            ])
-        })
+        users = await User.find({})
+        users.forEach(async user => {
+            user.stats = {}
+            user.notifications = [{
+                    type: "has just created notifications",
+                    author: "extremq",
+                    post: "60872ffff21428001518a028"
+                }]
+            await user.save()
+        });
         res.redirect('/')
     }
 })
@@ -104,14 +104,14 @@ router.post('/register', onlyNotAuth, async (req, res) => {
             return
         }
         else {
-            var check = await User.findOne({ name: req.body.name })
+            var check = await User.findOne({ name: req.body.name.lower() })
             if (check){
                 res.redirect('/register')
             }
             const hashedPassword = await bcrypt.hash(req.body.password, 10)
             var user = new User({
                 createdAt: Date.now().toString(),
-                name: req.body.name.trim(),
+                name: req.body.name.trim().lower(),
                 email: req.body.email.trim(),
                 password: hashedPassword
             });

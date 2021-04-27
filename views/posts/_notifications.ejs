@@ -1,0 +1,17 @@
+<div class="card-body">
+    <% if(count > 0) { %> 
+    <h5 class="card-title"><i class="fa fa fa-bell"></i> Notifications</h5>
+    <p class="card-subtitle text-muted"><small>Your last 5 notifications</small></p>
+</div>
+<ul class="list-group list-group-flush">
+    <% notifications.forEach(notification => { %>
+        <li class="list-group-item mb-1">
+            <small><a class="text-decoration-none" href="/u/<%= notification.author %>">@<%= notification.author %></a> <%= notification.type %>! <a class="text-decoration-none" href="/posts/<%= notification.post %>">Post link.</a></small><br>
+        </li>
+    <% })%>
+</ul>
+<% } else { %>
+<div class="card-body">
+    You have no notifications!  
+</div> 
+<% } %>

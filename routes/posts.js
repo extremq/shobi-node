@@ -16,6 +16,8 @@ const { JSDOM } = require('jsdom')
 const md = require('marked')
 const createDomPurify = require('dompurify')
 const { route } = require('.')
+const post = require('../models/post')
+const user = require('../models/user')
 const dompurify = createDomPurify(new JSDOM().window)
 
 async function getUserById(id) {
@@ -33,9 +35,30 @@ function addAction(post, type, author) {
     post.markModified('lastAction')
 }
 
+function addNotification(user, type, author, postID) {
+    user.notifications.unshift({
+        type: type,
+        author: author.name,
+        post: postID
+    })
+    if (user.notifications.length == 6) user.notifications.pop()
+    user.markModified('notifications')
+}
+
 // All Posts Route
 router.get('/', async(req, res) => {
     res.render('posts/index')
+})
+
+router.get('/notifications', onlyAuth, async(req, res) => {
+    var creator = await getUserById(req.session?.passport?.user)
+    notifications = creator.notifications
+    count = notifications.length
+    res.render('posts/_notifications', {
+        layout: false,
+        count: count,
+        notifications: notifications
+    })
 })
 
 router.get('/tags', async (req, res) => {
@@ -92,6 +115,33 @@ router.post('/:id/comment', onlyAuth, async (req, res) => {
     comment = req.body.comment.trim().substring(0, 255)
     if (comment.length > 1) {
         creator = await getUserById(req.session?.passport?.user)
+        notifiedAuthors = {}
+
+        // NOTIFICATIONS -- firstly, we notify the post creator
+        postCreator = await getUserById(post.author)
+        notifiedAuthors[postCreator.name] = true
+        if (postCreator.name != creator.name)
+            addNotification(postCreator, "commented on your post", creator, req.params.id)
+        await postCreator.save()
+        // Then, we notify whoever was tagged (ex: @extremq)
+        const findMentions = [...comment.matchAll('@([a-z\-_0-9]{3,16})')]
+        findMentions.forEach(async mention => {
+            if (notifiedAuthors[mention] == null) {
+                notifiedAuthors[mention] = true
+                mentioned = await User.findOne({ "name": mention})
+                addNotification(mentioned, "tagged you in a comment", creator, req.params.id)
+                await mentioned.save()
+            }
+        })
+        // Lastly, we notify users who also commented on the post
+        post.comments.arr.forEach(async comment => {
+            if (notifiedAuthors[comment.author] == null && comment.author != creator.name) {
+                notifiedAuthors[comment.author] = true
+                commenter = await User.findOne({ "name": comment.author })
+                addNotification(commenter, "commented on a post you also commented on", creator, req.params.id)
+                await commenter.save()
+            }
+        })
         post.comments.id += 1 
         post.comments.arr.push({
             id: post.comments.id,
@@ -117,8 +167,11 @@ router.get('/:id/like', onlyAuth, async(req, res) => {
         res.redirect('/posts/' + req.params.id)
         return
     }
+    var postCreator = await getUserById(post.author)
     post.likers.push(creator.name)
+    addNotification(postCreator, "liked your post", creator, req.params.id)
     addAction(post, "liked", creator.name)
+    await postCreator.save()
     await post.save()
     res.redirect('/posts/' + req.params.id)
 })

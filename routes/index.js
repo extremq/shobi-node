@@ -77,7 +77,7 @@ router.get('/authkey', onlyAuth, async (req, res) => {
     }
 })
 
-router.get('/update1', onlyAuth, async (req, res) => {
+router.get('/update', onlyAuth, async (req, res) => {
     // Comment the if/else clause in order to generate the first key
     if (req.session.passport.user != process.env.ADMIN_ID) {
         res.redirect('/')
@@ -95,31 +95,31 @@ router.get('/update1', onlyAuth, async (req, res) => {
             await user.save()
         })
         posts = await Post.find({})
-        posts.forEach(async post => {
-            post.comments.arr.forEach(async comment => {
-                author = await User.findOne({"name": comment.author.toLowerCase()})
+        for (const post of posts) {
+            for (const comment of post.comments.arr) {
+                const author = await User.findOne({"name": comment.author.toLowerCase()})
                 author.stats.comments += 1
-                author.markModified('stats.comments')
-                console.log(author)    
-                await author.save()
-            })
+                author.markModified('stats')
+                await author.save();
+            }
             
-            post.likers.forEach(async liker => {
-                author = await User.findOne({"name": liker.toLowerCase()})
+            for (const liker of post.likers) {
+                const author = await User.findOne({"name": liker.toLowerCase()}) 
                 author.stats.likesOutcoming += 1
-                author.markModified('stats.likesOutcoming')
+                author.markModified('stats')
                 await author.save()
-            })
-        });
+        
+            }
+        }
 
-        posts.forEach(async post => {
+        for (const post of posts) {
             creator = await User.findById(post.author)
             creator.stats.posts +=1
             creator.stats.likesIncoming += post.likers.length
             creator.markModified('stats.posts')
             creator.markModified('stats.likesIncoming')
             await creator.save()
-        })
+        }
         res.redirect('/')
     }
 })

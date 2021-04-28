@@ -8,13 +8,16 @@
                 </button>
                 <div class="collapse navbar-collapse text-center" id="navbarsExample11">
                     <ul class="navbar-nav">
-                        <li class="nav-item active">
+                        <li class="nav-item">
                             <a class="nav-link" href="/posts">Posts</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/posts/new">Add post</a>
                         </li>
                         <% if(user) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/u/<%=user.name%>">Profile</a>
+                        </li>
                         <li class="nav-item">
                             <form action="/logout?_method=DELETE" method="post">
                             <button class="btn btn-link text-muted" style="text-decoration: none" type="submit">Sign out <i class="fa fa-sign-out-alt"></i></button>

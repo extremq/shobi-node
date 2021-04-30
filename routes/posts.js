@@ -386,54 +386,57 @@ router.put('/:id', onlyAuth, async (req, res) => {
             post: post,
             errorMessage: 'You need to provide a description if you post text.'
         })
+        return 
     }
-    else if(description == '' && markdown == '' && banner == null) {
+    if((description == '' || markdown == '') && !(post.banner || banner)) {
         res.render(`posts/edit`, {
             post: post,
             errorMessage: 'You need to post an image if you dont have a description/text.'
         })
+        return
     }
-    else if(banner?.size > 10485760) {
+    if(banner?.size > 10485760) {
         res.render(`posts/edit`, {
             post: post,
             errorMessage: 'The image is too big (max. 10MB).'
         })
+        return
     }
-    else
-        try {
-            post.title = title
-            post.description = description
-            post.markdown = markdown
-            post.tags = tags
-            if (banner) {
-                fetch("https://api.imgur.com/3/image", {
-                    method: "POST",
-                    headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                            "Authorization": "Client-ID " + process.env.IMGUR_ID
-                        },
-                    body: `type=base64&image=${encodeURIComponent(banner?.data)}`
-                    }).then((resp) => resp.json()).then(async (data) => {
-                        post.banner = data.data.link
-                        post.deleteHash = data.data.deletehash
-                        await post.save()
-                        res.redirect(`${id}`)
-                        return
-                    }).catch((err) => {
-                        console.error(err)
-                })
-            }
-            else {
-                await post.save()
-                res.redirect(`${id}`)
-                return
-            }
-        } catch {
-            res.render(`posts/edit`, {
-                post: post,
-                errorMessage: 'Error creating post.'
+    
+    try {
+        post.title = title
+        post.description = description
+        post.markdown = markdown
+        post.tags = tags
+        if (banner) {
+            fetch("https://api.imgur.com/3/image", {
+                method: "POST",
+                headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Authorization": "Client-ID " + process.env.IMGUR_ID
+                    },
+                body: `type=base64&image=${encodeURIComponent(banner?.data)}`
+                }).then((resp) => resp.json()).then(async (data) => {
+                    post.banner = data.data.link
+                    post.deleteHash = data.data.deletehash
+                    await post.save()
+                    res.redirect(`${id}`)
+                    return
+                }).catch((err) => {
+                    console.error(err)
             })
         }
+        else {
+            await post.save()
+            res.redirect(`${id}`)
+            return
+        }
+    } catch {
+        res.render(`posts/edit`, {
+            post: post,
+            errorMessage: 'Error creating post.'
+        })
+    }
 })
 
 // Delete post

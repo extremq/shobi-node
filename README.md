@@ -2,7 +2,7 @@
 This is a website made using **Node.js**, **Express** and **MongoDB** for the server.
 It also uses **jQuery** and **ajax** for some parts of content loading, combined with **EJS** for rendering the pages.
 
-You can check out a live version of it on https://shoby.herokuapp.com.
+The site supports liking, commenting, notifications, tagging, mentioning and markdown.
 
 If you want to modify this project on your machine, clone the project using `git clone https://github.com/extremq/shobi-node.git`.
 After that, run `npm install` inside the folder to fetch all the **node modules**.
@@ -18,3 +18,21 @@ You need to [create an Imgur account](https://imgur.com/register) and [register 
 I suggest modifying the `router.get('/authkey')` route found in `routes/index.js` so you can generate an authkey. After creating an account with it (check `router.post('/register')` first), change it back and set `ADMIN_ID` to be the new account's id.
 Now, you only need to run `npm run devStart` to fire up a server on `localhost:3000`. 
 That's it!
+
+# Examples
+
+![](https://i.imgur.com/s3GTQA0.png)
+
+General interface
+
+![](https://i.imgur.com/g3KsoJm.png)
+
+Search parameters
+
+![](https://i.imgur.com/2HPzgfa.png)
+
+Example post
+
+![](https://i.imgur.com/vFRDgIO.png)
+
+Comments
